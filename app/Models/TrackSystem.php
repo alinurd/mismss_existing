@@ -198,7 +198,7 @@ class TrackSystem extends Model
                         ->join("service_list", "service_list.id", "=", "data_list.service_id")
                         ->join("warehouse_list", "warehouse_list.id", "=", "data_list.warehouse_id")
                         ->where("data_list.shipping_number",$msTrackId)
-                        ->first();   
+                        ->first();
 
             $dataCust['shipmentDate'] = $this->controller->dateFormatIndo($getDataList->to_sg_man_created_at,1);
             $dataCust['wareId'] = $getDataList->wareid;
@@ -250,8 +250,8 @@ class TrackSystem extends Model
                         ->join("service_list", "service_list.id", "=", "data_list.service_id")
                         ->join("warehouse_list", "warehouse_list.id", "=", "data_list.warehouse_id")
                         ->where("data_list.mismass_invoice_id",$invoiceId)
-                        ->first();  
-            
+                        ->first();
+
             $checkShipDate = DB::table("shiptrip_list")->where("ms_track_id",$msTrackId)->value("to_sg_man_created_at");
             $dataCust['shipmentDate'] = $this->controller->dateFormatIndo($checkShipDate,1);
             $dataCust['wareId'] = $getDataList->wareid;
@@ -271,7 +271,11 @@ class TrackSystem extends Model
             $dataCust['berat'] = $this->controller->pembulatan(round($getDataList->total_kg,2))." Kg (Actual : ".round($getDataList->total_kg,2)." Kg)";
             $dataCust['item'] = $getDataList->total_item;
             $dataCust['cbm'] = round($getDataList->total_cbm,2);
-            $dataCust['invoiceNumber'] = "<a class='fw-bold text-inv' href='".url('/p')."/".$getDataList->mismass_invoice_link."' target='_blank'>".$getDataList->mismass_invoice_id."</a><div class='text-view'>Klik nomor invoice untuk melihat</div>";
+            if(strtoupper(trim($dataCust['fullName']))=="SATURDAY CLUB PTE LTD"){
+                $dataCust['invoiceNumber'] = "<span class='fw-bold text-inv'>".$getDataList->mismass_invoice_id."</span>";
+            }else{
+                $dataCust['invoiceNumber'] = "<a class='fw-bold text-inv' href='".url('/p')."/".$getDataList->mismass_invoice_link."' target='_blank'>".$getDataList->mismass_invoice_id."</a><div class='text-view'>Klik nomor invoice untuk melihat</div>";
+            }
             $checkResiLN = DB::table("shiptrip_foreign_track_list")
                 ->selectRaw("GROUP_CONCAT(shiptrip_foreign_track_list.id SEPARATOR ', ') AS foreign_tracks")
                 ->where("ms_track_id",$msTrackId)
@@ -310,7 +314,7 @@ class TrackSystem extends Model
             $dataCust['wareLoc'] = $getDataShipTrip->wareloc;
             if($getDataShipTrip->custtypeid=="IND"){
                 $dataCust['servName'] = $getDataShipTrip->servname;
-            }            
+            }
             $dataCust['fullName'] = $getDataShipTrip->full_name;
             $dataCust['phone'] = $getDataShipTrip->phone;
             $dataCust['fullAddress'] = $getDataShipTrip->full_address;
@@ -434,7 +438,7 @@ $details .= "
 
         $array = array(
             "status" => 200,
-            "id" => $data['wayBill'][0]['id'], 
+            "id" => $data['wayBill'][0]['id'],
             "details" => $details,
             "waybills" => $select?$data['wayBill']:'',
             "timeline" => $timeline
@@ -442,19 +446,19 @@ $details .= "
 
         return $array;
     }
-    
+
     public static function checkResiTemporary($waybill){
         $check = DB::table("data_list")
                     ->select("shipping_number_stats")
                     ->where("shipping_number",$waybill)
                     ->first();
-        
+
         if($check==null){
             $checktwo = DB::table("order_list")
                 ->select("invoice_id")
                 ->where("ms_track_id",$waybill)
                 ->first();
-                
+
             if($checktwo==null){
                 return "";
             }
@@ -464,25 +468,25 @@ $details .= "
                 ->select("cust_type_id","shipping_number_stats")
                 ->where("mismass_invoice_id",$checktwo->invoice_id)
                 ->first();
-                
+
             if($check==null){
                 return "";
             }
-            
+
             if($check->cust_type_id=="COR"){
                 return "";
             }
         }
-        
+
         if(!$check->shipping_number_stats){
             return "";
         }
-        
+
         return "<div class='btnStatus btnStatusHold'>Temporary</div>";
     }
-    
+
     public static function checkTimelineText($txt,$waybill,$mode){
-        
+
         if($txt=="PROCESSN"){
             $check = DB::table("data_list")
                     ->select("forwarder_name","shipping_number","shipping_number_stats")
@@ -500,7 +504,7 @@ $details .= "
                     ->where("mismass_invoice_id",$checktwo->invoice_id)
                     ->first();
             }
-            
+
             //mode
             //0 Tracking
             //1 Table
@@ -508,7 +512,7 @@ $details .= "
             if($mode==0){
                 $copyBtn = "<a id='copyResi' data-shipnum='".$check->shipping_number."' class='pointlink'>Copy Resi</a>";
             }
-            
+
             //Jika Resi Sementara
             if($check->shipping_number_stats){
                 return "Paket diteruskan oleh pihak ".$check->forwarder_name;
