@@ -1,0 +1,33 @@
+.daterangepicker select.hourselect, .daterangepicker select.minuteselect, .daterangepicker select.secondselect, .daterangepicker select.ampmselect{
+    width:50px;
+    height:50px;
+    font-size:20px;
+    text-align:center;
+}
+
+.daterangepicker .drp-calendar.left,
+    .daterangepicker .drp-calendar.right{
+        max-width:none;
+    }
+
+/* @media (max-width:563px) {    
+    
+} */
+
+@media (min-width:563px) {
+    .daterangepicker.ltr.single.opensright.show-calendar{
+        width:355px;
+    }
+
+    .daterangepicker.single .drp-calendar.left{
+        max-width:none;
+        display:flex;
+        align-items:center;
+    }
+
+    .daterangepicker .calendar-time{
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    }
+}

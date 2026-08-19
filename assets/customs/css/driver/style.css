@@ -1,0 +1,472 @@
+body{
+
+    background:#f7f7f7;
+	font-family: 'Poppins', sans-serif;
+	font-size:14px;
+}
+
+.label-lacak {
+    font-size: 12px;
+    font-weight: bold;
+}
+        
+.label-waktu {
+    font-size: 12px;
+}
+
+.row.detail {
+    font-size: 12px;
+}
+
+h5{
+    font-size:15px;
+    font-weight:600;
+}
+
+.form-control{
+    font-size:14px;
+}
+
+.bg-header {
+	background: #ffc107;
+	color: black;
+}
+
+.martop{
+	margin-top:70px;
+}
+
+.card-warning{
+    color:#ffc107;
+    font-size:12px;
+    background-color:inherit;
+    border:1px solid;
+    border-color:#ffc107;
+    border-radius:5px 5px 5px 5px;
+}
+
+.warning{
+    padding:5px 5px 5px 5px;
+}
+
+/*///////////////// LOGO HEADER ///////////////// */
+
+.fixed-top{
+    padding-top:5px;
+    padding-bottom:5px;
+}
+
+/*///////////////// WALL //////////////////////// */
+
+.wall-container {
+	position: relative;
+    width: 100%;
+    margin-bottom:80px;
+}
+.wall2 {
+	position: fixed;
+    z-index: -1;
+    width: 160%;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 220px;
+}
+.wall2 svg{
+    height: 100%; 
+    width: 100%;
+}
+
+
+/*///////////////// WALL ENDS HERE//////////////////////// */
+
+/*//////////// MODAL /////////////////////////// */
+
+.modal{
+    border:none;
+}
+
+.modal-content{
+    border:none;
+    border-radius:1rem;
+}
+
+.modal-header{
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+.modal-body{
+    border:none;
+}
+
+.kotak{
+	padding:10px 10px 10px 10px;
+	background:#e6e6e6;
+	border-radius:.5rem;
+}
+
+.kotak2{
+	padding:15px 15px 15px 15px;
+	background: #ffc107;
+	color: black;
+	border-radius:.5rem;
+}
+
+.kotak .col-8{
+
+	font-size:16px;
+	font-weight: 600;
+
+}
+
+.kotak .col-2{
+
+	font-size:16px;
+
+}
+
+.input-text-button {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 20px;
+    font-weight: 400;
+}
+/*//////////// MODAL ENDS HERE ///////////////// */
+
+/*//////////// CEK ONGKIR /////////////////////// */
+
+.container-360{
+	max-width:450px;
+}
+
+.container-400{
+    max-width:350px;
+}
+
+.swiper-container{
+	width:100%;
+	margin-bottom:20px;
+}		
+.swiper-slide{    
+    width:100%;
+}
+
+.swiper-slide img{    
+    width:100%;
+}
+
+.medsos .col-3{
+	padding-left:0px;
+	padding-right:0px;
+}
+
+.btn-medsos{
+    padding-top:7px;
+    padding-bottom:7px;
+	background:#ffc107;
+	width:48px;
+	height:46px;
+	border-radius: 50%;
+	font-size:20px;
+	color: black;
+}
+
+.btn-medsos:hover{
+    color: black;
+}
+
+
+
+/*//////////////// CEK ONGKIR ENDS HERE /////////////////// */
+
+/* //////////////// JQUERY AUTOCOMPLETE ///////////////// */
+
+
+    .ui-autocomplete {
+    max-height: 150px;
+    max-width: 82%;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+  }
+  /* IE 6 doesn't support max-height
+   * we use height instead, but this forces the menu to always be this tall
+   */
+  * html .ui-autocomplete {
+    height: 150px;
+    width: 82%;
+  }
+  
+/* ////////////////////////////////////////////////////// */
+
+      .bg-texas{
+        background:#ffc107;
+        color:black;
+    }
+    /* LACAK PROPERTY */
+    .lacak-pos{
+	    margin-bottom:5px;
+    }
+    
+    /* TAB PROPERTY */
+
+    .tab{
+	    height: 50px;
+	    background:white;
+	    color:#ffc107;
+	    padding:0;
+	
+	    border-radius: 5px 5px 5px 5px;
+	
+	    -webkit-box-shadow: 2px 2px 15px -5px rgba(0,0,0,0.5);
+	    -moz-box-shadow: 2px 2px 15px -5px rgba(0,0,0,0.5);
+	    box-shadow: 2px 2px 15px -5px rgba(0,0,0,0.5);
+        transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+    }
+
+    .tab:hover{
+	    color:#ffc107;
+    }
+
+    .tab-apps .active{
+	    background:#ffc107;
+	    color:white;
+    }
+
+    .tab-apps a{
+	    padding-top: 15px;
+	    padding-bottom: 15px;
+    }
+
+    /* TAB PROPERTY ENDS HERE */
+    
+    /* FORM INPUT PROPERTY */
+
+.form-pos{
+
+	margin-bottom:25px;
+
+}
+
+.card{
+    border:none;
+}
+
+.apps-cust .card-body,.apps-kurir .card-body{
+
+	border-radius: 15px;
+	background:white;
+	
+	-webkit-box-shadow: 2px 2px 15px -5px rgba(0,0,0,0.5);
+	-moz-box-shadow: 2px 2px 15px -5px rgba(0,0,0,0.5);
+	box-shadow: 2px 2px 15px -5px rgba(0,0,0,0.5);
+    transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+
+}
+
+.sml_screen{
+
+	margin-bottom:10px;
+
+}
+
+/* FORM PROPERTY ENDS HERE */
+
+/* MEDSOS PROPERTY */
+
+.medsos-pos{
+
+	margin-bottom:20px;
+
+}
+
+.medsos{
+    
+	padding-top:15px;
+	padding-bottom:15px;
+	padding-left:30px;
+	padding-right:30px;
+	background:white;
+	border-radius: 10px 10px 10px 10px;
+	
+	-webkit-box-shadow: 2px 2px 15px -10px rgba(0,0,0,0.5);
+	-moz-box-shadow: 2px 2px 15px -10px rgba(0,0,0,0.5);
+	box-shadow: 2px 2px 15px -10px rgba(0,0,0,0.5);
+
+}
+.medsos-icon{
+	margin-left:25px;
+	margin-right:25px;
+}
+
+@media only screen and (max-width: 360px) {
+  .medsos-icon{
+	margin-left:5px;
+	margin-right:5px;
+}
+}
+
+/* MEDSOS PROPERTY ENDS HERE */
+
+/* FIXED-BOTTOM PROPERTY */
+
+.fixed-bottom{
+
+    background:#ffc107;
+	font-size:8px;
+	padding-top:10px;
+	padding-bottom:7px;
+	box-shadow: 0px 0px 13px -7px rgba(0,0,0,0.5);
+
+}
+
+.fixed-bottom .col-4{
+    padding-left:5px;
+    padding-right:5px;
+}
+
+.fixed-bottom .icon,.fixed-bottom .icon2{
+	font-size:21px;
+}
+
+.fixed-bottom .label, .fixed-bottom .icon{
+	color:#ffc107;
+}
+
+.fixed-bottom a{
+	color:white;
+	line-height:1.2rem;
+	font-size:12px;
+}
+
+.fixed-bottom a:hover{
+	color:black;
+	text-decoration:none;
+}
+
+/* FIXED-BOTTOM ENDS HERE */
+
+.btn-texas{
+    background:#cc3300;
+    color:white;
+    padding-top:4px;
+    padding-bottom:5px;
+}
+
+.btn-texas:hover{
+    background:#962905;
+}
+
+/*////////MODAL////////*/
+
+.modal a{
+    font-size:14px;
+    color:#ffc107;
+}
+
+.modal .btn-secondary{
+    color:white;
+}
+
+.modal a{
+    text-decoration:none;
+}
+
+.modal .card-body{
+    padding:10px 10px 10px 10px;
+    background:#e9ecef;
+    -webkit-box-shadow: 2px 2px 15px -5px rgba(0,0,0,0.5);
+	-moz-box-shadow: 2px 2px 15px -5px rgba(0,0,0,0.5);
+	box-shadow: 2px 2px 15px -5px rgba(0,0,0,0.5);
+    transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+}
+
+.modal .card-body .judul{
+    margin-bottom:10px;
+    font-weight:600;
+    color:#ffc107;
+}
+
+.modal .hasil{
+    font-weight:600;
+    line-height:1;
+}
+
+.modal .detil{
+    font-weight:600;
+}
+
+.modal .card-body .hasil2{
+    font-size:25px;
+    font-weight:600;
+}
+
+.modal a img{
+    width:48px;
+}
+
+.modal a .wa-pos{
+    padding-top:10px;
+    padding-bottom:10px;
+}
+
+.modal a .wa-pos2{
+    padding-top:16px;
+    padding-bottom:16px;
+}
+
+.modal a .status{
+    font-size:11px;
+    color:#a79f9f;
+}
+
+.modal a .icon{
+    font-size:20px;
+    padding-top:20px;
+    padding-bottom:20px;
+    color:#ffc107;
+}
+
+.navbar-toggler{
+    padding:0px;
+}
+.nav-link{
+    color:white;
+}
+.table{
+    font-size:10px;
+}
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    background-color:inherit;
+    border-bottom-color: red;
+    border-style: solid;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+}
+.dataTables_wrapper .dataTables_filter {
+    width: 100%;
+}
+.dataTables_wrapper .dataTables_filter input {
+    width: 235px;
+}
+.fixed-top{
+    padding:0px;
+}
+.disabled {
+pointer-events: none;
+cursor: default;
+}
+
+.n-kurir {
+    padding: 4px;
+    border-radius: 15px;
+    background: #ffc107;
+    color: white;
+    text-align: center;
+}
+
+h2#swal2-title {
+    font-size: 20px;
+}

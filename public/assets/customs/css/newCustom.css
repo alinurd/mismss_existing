@@ -1,0 +1,109 @@
+/* Firefox */
+/* {
+    scrollbar-width: 10px;
+    scrollbar-color: #e9ecef #DFE9EB;
+  }
+  
+  /* Chrome, Edge and Safari */
+  /*::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background-color: #DFE9EB;
+  }
+
+  *::-webkit-scrollbar-track:hover {
+    background-color: #B8C0C2;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background-color: #ffc107;
+  }
+  
+  /* *::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background-color: #DFE9EB;
+  }
+  
+  *::-webkit-scrollbar-track:hover {
+    background-color: #B8C0C2;
+  }
+  
+  *::-webkit-scrollbar-track:active {
+    background-color: #B8C0C2;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background-color: #e9ecef;
+  }
+  
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: #ffc107;
+  }
+  
+  *::-webkit-scrollbar-thumb:active {
+    background-color: #ffc107;
+  }   */
+  
+
+/*/////////////// STATUS HOLD//////////*/
+
+.btnStatus{
+  font-weight:700;
+  padding:5px;
+  max-width:fit-content;
+  cursor: pointer;
+}
+
+.btnStatusReady {
+  color: green;
+  background: #00800033;
+  border-radius: 6px;
+  font-size: 12px !important;
+}
+
+.btnStatusHold {
+  color: red;
+  background: #ff000024;
+  border-radius: 6px;
+  font-size: 12px !important;
+}
+
+/*/////////////// END STATUS //////////*/
+
+
+
+
+/*/////////////// NEW BTN //////////*/
+
+button#viewOne, button#viewTwo, button#resetOne {
+  min-width: max-content;
+}
+
+/*/////////////// END BTN //////////*/
+
+
+.aBtn{
+cursor:pointer;
+}
+
+select.novalid,
+input.novalid{
+  border-color: #dc3545;
+  padding-right: 2.25rem!important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e")!important;
+  background-repeat: no-repeat;
+  background-position: right calc(.375em + .1875rem) center;
+  background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+}
+
+label.novalid{
+  color: #dc3545;
+  font-size: 10px;
+  font-weight: 600 !important;
+}

@@ -1,0 +1,931 @@
+body{
+
+    background:#f7f7f7;
+	font-family: 'Poppins', sans-serif;
+	font-size:14px;
+}
+
+/* BACK TO TOP */
+#myBtn {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 99;
+  font-size: 20px;
+  border: none;
+  outline: none;
+  background-color: #ffc107;
+  color: white;
+  cursor: pointer;
+  padding: 5px 12px 5px 12px;
+  border-radius: 5px;
+  box-shadow:-2px 2px 10px -1px rgb(0 0 0 / 50%);
+}
+
+#myBtn:hover {
+  background-color: #555;
+}
+/* END BACK TO TOP */
+
+
+
+table#table_kurir {
+    font-weight: bold;
+}
+
+a.bg-update {
+    background-color: #dc3545;
+    padding: 5px 7px 5px 7px;
+    border-radius: 5px;
+    color: white !important;
+}
+
+a.disabled{
+    background-color: #6c757d;
+    padding: 5px 7px 5px 7px;
+    border-radius: 5px;
+}
+
+.marbot-100{
+	margin-bottom:5px;
+}
+
+.martop-80{
+	margin-top:60px;
+}
+
+h5{
+    font-size:15px;
+    font-weight:600;
+}
+
+.form-control{
+    font-size:14px;
+}
+
+.bg-header {
+	background: #ffc107;
+	color: black;
+}
+
+.martop{
+	margin-top:70px;
+}
+
+.card-warning{
+    color:#ffc107;
+    font-size:12px;
+    background-color:inherit;
+    border:1px solid;
+    border-color:#ffc107;
+    border-radius:5px 5px 5px 5px;
+}
+
+.warning{
+    padding:5px 5px 5px 5px;
+}
+
+/*///////////////// LOGO HEADER ///////////////// */
+
+.fixed-top{
+    padding-top:5px;
+    padding-bottom:5px;
+}
+
+/*///////////////// WALL //////////////////////// */
+
+.wall-container {
+	position: relative;
+    width: 100%;
+    margin-bottom:80px;
+}
+.wall2 {
+	position: fixed;
+    z-index: -1;
+    width: 160%;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 220px;
+}
+.wall2 svg{
+    height: 100%; 
+    width: 100%;
+}
+
+
+/*///////////////// WALL ENDS HERE//////////////////////// */
+
+/*//////////// MODAL /////////////////////////// */
+
+.col.detail {
+    font-weight: bold;
+}
+
+.modal{
+    border:none;
+}
+
+.modal-content{
+    border:none;
+    border-radius:1rem;
+}
+
+.modal-header{
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+.modal-body{
+    border:none;
+}
+
+.kotak{
+	padding:10px 10px 10px 10px;
+	background:#e6e6e6;
+	border-radius:.5rem;
+}
+
+.kotak2{
+	padding:15px 15px 15px 15px;
+	background: #ffc107;
+	color: black;
+	border-radius:.5rem;
+}
+
+.kotak .col-8{
+
+	font-size:16px;
+	font-weight: 600;
+
+}
+
+.kotak .col-2{
+
+	font-size:16px;
+
+}
+
+.input-text-button {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 20px;
+    font-weight: 400;
+}
+/*//////////// MODAL ENDS HERE ///////////////// */
+
+/*//////////// CEK ONGKIR /////////////////////// */
+
+.container-360{
+	max-width:450px;
+}
+
+.container-400{
+    max-width:350px;
+}
+
+.swiper-container{
+	width:100%;
+	margin-bottom:20px;
+}		
+.swiper-slide{    
+    width:100%;
+}
+
+.swiper-slide img{    
+    width:100%;
+}
+
+.medsos .col-3{
+	padding-left:0px;
+	padding-right:0px;
+}
+
+.btn-medsos{
+    padding-top:7px;
+    padding-bottom:7px;
+	background:linear-gradient(180deg, #ffc107 65%, #b88b07 115%);
+	width:48px;
+	height:46px;
+	border-radius: 50%;
+	font-size:20px;
+	color: black;
+}
+
+.btn-medsos:hover{
+    color: black;
+}
+
+
+
+/*//////////////// CEK ONGKIR ENDS HERE /////////////////// */
+
+/* //////////////// JQUERY AUTOCOMPLETE ///////////////// */
+
+
+    .ui-autocomplete {
+    max-height: 150px;
+    max-width: 82%;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+  }
+  /* IE 6 doesn't support max-height
+   * we use height instead, but this forces the menu to always be this tall
+   */
+  * html .ui-autocomplete {
+    height: 150px;
+    width: 82%;
+  }
+  
+/* ////////////////////////////////////////////////////// */
+
+      .bg-texas{
+        background:linear-gradient(180deg, #ffc107 65%, #b88b07 115%);
+        color:black;
+    }
+    /* LACAK PROPERTY */
+    .lacak-pos{
+	    margin-bottom:5px;
+    }
+    
+    /* TAB PROPERTY */
+
+    .tab{
+	    height: 50px;
+	    background:white;
+	    color:#ffc107;
+	    padding:0;
+	
+	    border-radius: 5px 5px 5px 5px;
+	
+	    -webkit-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	    -moz-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	    box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+        transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+    }
+
+    .tab:hover{
+	    color:#ffc107;
+    }
+
+    .tab-apps .active{
+	    background:linear-gradient(180deg, #ffc107 65%, #b88b07 115%);
+	    color:white;
+    }
+
+    .tab-apps a{
+	    padding-top: 15px;
+	    padding-bottom: 15px;
+    }
+
+    /* TAB PROPERTY ENDS HERE */
+    
+    /* FORM INPUT PROPERTY */
+
+.form-pos{
+
+	margin-bottom:25px;
+
+}
+
+.apps-cust .card-body,.apps-kurir .card-body{
+
+	border-radius: 8px 8px 8px 8px;
+	background:white;
+	
+	-webkit-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	-moz-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+    transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+
+}
+
+.sml_screen{
+
+	margin-bottom:10px;
+
+}
+
+/* FORM PROPERTY ENDS HERE */
+
+/* MEDSOS PROPERTY */
+
+.medsos-pos{
+
+	margin-bottom:20px;
+
+}
+
+.medsos{
+    
+	padding-top:15px;
+	padding-bottom:15px;
+	padding-left:30px;
+	padding-right:30px;
+	background:white;
+	border-radius: 10px 10px 10px 10px;
+	
+	-webkit-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	-moz-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+
+}
+.medsos-icon{
+	margin-left:25px;
+	margin-right:25px;
+}
+
+@media only screen and (max-width: 360px) {
+  .medsos-icon{
+	margin-left:5px;
+	margin-right:5px;
+}
+}
+
+/* MEDSOS PROPERTY ENDS HERE */
+
+/* FIXED-BOTTOM PROPERTY */
+
+.fixed-bottom{
+
+    background:white;
+	font-size:8px;
+	padding-top:10px;
+	padding-bottom:7px;
+	box-shadow: 0px 0px 13px -7px rgba(0,0,0,0.5);
+
+}
+
+.fixed-bottom .col-3{
+    padding-left:5px;
+    padding-right:5px;
+}
+
+.fixed-bottom .icon,.fixed-bottom .icon2{
+	font-size:21px;
+}
+
+.fixed-bottom .label, .fixed-bottom .icon{
+	color:#ffc107;
+}
+
+.fixed-bottom a{
+	color:#6c757d;
+	line-height:1.2rem;
+	font-size:12px;
+}
+
+.fixed-bottom a:hover{
+	color:#ffc107;
+	text-decoration:none;
+}
+
+/* FIXED-BOTTOM ENDS HERE */
+
+.btn-texas{
+    background:linear-gradient(180deg, #cc3300 65%, #8f0916 115%);
+    color:white;
+    padding-top:4px;
+    padding-bottom:5px;
+}
+
+.btn-texas:hover{
+    background:#962905;
+}
+
+/*////////MODAL////////*/
+
+.modal a{
+    font-size:14px;
+    color:#ffc107;
+}
+
+.modal .btn-secondary{
+    color:white;
+}
+
+.modal a{
+    text-decoration:none;
+}
+
+.modal .card-body{
+    padding:10px 10px 10px 10px;
+    background:#e9ecef;
+    -webkit-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	-moz-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+    transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+}
+
+.modal .card-body .judul{
+    margin-bottom:10px;
+    font-weight:600;
+    color:#ffc107;
+}
+
+.modal .hasil{
+    font-weight:600;
+    line-height:1;
+}
+
+.modal .detil{
+    font-weight:600;
+}
+
+.modal .card-body .hasil2{
+    font-size:25px;
+    font-weight:600;
+}
+
+.modal a img{
+    width:48px;
+}
+
+.modal a .wa-pos{
+    padding-top:10px;
+    padding-bottom:10px;
+}
+
+.modal a .wa-pos2{
+    padding-top:16px;
+    padding-bottom:16px;
+}
+
+.modal a .status{
+    font-size:11px;
+    color:#a79f9f;
+}
+
+.modal a .icon{
+    font-size:20px;
+    padding-top:20px;
+    padding-bottom:20px;
+    color:#ffc107;
+}body{
+
+    background:#f7f7f7;
+	font-family: 'Poppins', sans-serif;
+	font-size:14px;
+}
+
+/* BACK TO TOP */
+#myBtn {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 99;
+  font-size: 20px;
+  border: none;
+  outline: none;
+  background-color: #ffc107;
+  color: white;
+  cursor: pointer;
+  padding: 5px 12px 5px 12px;
+  border-radius: 5px;
+  box-shadow:-2px 2px 10px -1px rgb(0 0 0 / 50%);
+}
+
+#myBtn:hover {
+  background-color: #555;
+}
+/* END BACK TO TOP */
+
+
+
+table#table_kurir {
+    font-weight: bold;
+}
+
+a.bg-update {
+    background-color: #dc3545;
+    padding: 5px 7px 5px 7px;
+    border-radius: 5px;
+    color: white !important;
+}
+
+a.disabled{
+    background-color: #6c757d;
+    padding: 5px 7px 5px 7px;
+    border-radius: 5px;
+}
+
+.marbot-100{
+	margin-bottom:5px;
+}
+
+.martop-80{
+	margin-top:60px;
+}
+
+h5{
+    font-size:15px;
+    font-weight:600;
+}
+
+.form-control{
+    font-size:14px;
+}
+
+.bg-header {
+	background: #ffc107;
+	color: black;
+}
+
+.martop{
+	margin-top:70px;
+}
+
+.card-warning{
+    color:#ffc107;
+    font-size:12px;
+    background-color:inherit;
+    border:1px solid;
+    border-color:#ffc107;
+    border-radius:5px 5px 5px 5px;
+}
+
+.warning{
+    padding:5px 5px 5px 5px;
+}
+
+/*///////////////// LOGO HEADER ///////////////// */
+
+.fixed-top{
+    padding-top:5px;
+    padding-bottom:5px;
+}
+
+/*///////////////// WALL //////////////////////// */
+
+.wall-container {
+	position: relative;
+    width: 100%;
+    margin-bottom:80px;
+}
+.wall2 {
+	position: fixed;
+    z-index: -1;
+    width: 160%;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 220px;
+}
+.wall2 svg{
+    height: 100%; 
+    width: 100%;
+}
+
+
+/*///////////////// WALL ENDS HERE//////////////////////// */
+
+/*//////////// MODAL /////////////////////////// */
+
+.col.detail {
+    font-weight: bold;
+}
+
+.modal{
+    border:none;
+}
+
+.modal-content{
+    border:none;
+    border-radius:1rem;
+}
+
+.modal-header{
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+.modal-body{
+    border:none;
+}
+
+.kotak{
+	padding:10px 10px 10px 10px;
+	background:#e6e6e6;
+	border-radius:.5rem;
+}
+
+.kotak2{
+	padding:15px 15px 15px 15px;
+	background: #ffc107;
+	color: black;
+	border-radius:.5rem;
+}
+
+.kotak .col-8{
+
+	font-size:16px;
+	font-weight: 600;
+
+}
+
+.kotak .col-2{
+
+	font-size:16px;
+
+}
+
+.input-text-button {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 20px;
+    font-weight: 400;
+}
+/*//////////// MODAL ENDS HERE ///////////////// */
+
+/*//////////// CEK ONGKIR /////////////////////// */
+
+.container-360{
+	max-width:450px;
+}
+
+.container-400{
+    max-width:350px;
+}
+
+.swiper-container{
+	width:100%;
+	margin-bottom:20px;
+}		
+.swiper-slide{    
+    width:100%;
+}
+
+.swiper-slide img{    
+    width:100%;
+}
+
+.medsos .col-3{
+	padding-left:0px;
+	padding-right:0px;
+}
+
+.btn-medsos{
+    padding-top:7px;
+    padding-bottom:7px;
+	background:linear-gradient(180deg, #ffc107 65%, #b88b07 115%);
+	width:48px;
+	height:46px;
+	border-radius: 50%;
+	font-size:20px;
+	color: black;
+}
+
+.btn-medsos:hover{
+    color: black;
+}
+
+
+
+/*//////////////// CEK ONGKIR ENDS HERE /////////////////// */
+
+/* //////////////// JQUERY AUTOCOMPLETE ///////////////// */
+
+
+    .ui-autocomplete {
+    max-height: 150px;
+    max-width: 82%;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+  }
+  /* IE 6 doesn't support max-height
+   * we use height instead, but this forces the menu to always be this tall
+   */
+  * html .ui-autocomplete {
+    height: 150px;
+    width: 82%;
+  }
+  
+/* ////////////////////////////////////////////////////// */
+
+      .bg-texas{
+        background:linear-gradient(180deg, #ffc107 65%, #b88b07 115%);
+        color:black;
+    }
+    /* LACAK PROPERTY */
+    .lacak-pos{
+	    margin-bottom:5px;
+    }
+    
+    /* TAB PROPERTY */
+
+    .tab{
+	    height: 50px;
+	    background:white;
+	    color:#ffc107;
+	    padding:0;
+	
+	    border-radius: 5px 5px 5px 5px;
+	
+	    -webkit-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	    -moz-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	    box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+        transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+    }
+
+    .tab:hover{
+	    color:#ffc107;
+    }
+
+    .tab-apps .active{
+	    background:linear-gradient(180deg, #ffc107 65%, #b88b07 115%);
+	    color:white;
+    }
+
+    .tab-apps a{
+	    padding-top: 15px;
+	    padding-bottom: 15px;
+    }
+
+    /* TAB PROPERTY ENDS HERE */
+    
+    /* FORM INPUT PROPERTY */
+
+.form-pos{
+
+	margin-bottom:25px;
+
+}
+
+.apps-cust .card-body,.apps-kurir .card-body{
+
+	border-radius: 8px 8px 8px 8px;
+	background:white;
+	
+	-webkit-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	-moz-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+    transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+
+}
+
+.sml_screen{
+
+	margin-bottom:10px;
+
+}
+
+/* FORM PROPERTY ENDS HERE */
+
+/* MEDSOS PROPERTY */
+
+.medsos-pos{
+
+	margin-bottom:20px;
+
+}
+
+.medsos{
+    
+	padding-top:15px;
+	padding-bottom:15px;
+	padding-left:30px;
+	padding-right:30px;
+	background:white;
+	border-radius: 10px 10px 10px 10px;
+	
+	-webkit-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	-moz-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+
+}
+.medsos-icon{
+	margin-left:25px;
+	margin-right:25px;
+}
+
+@media only screen and (max-width: 360px) {
+  .medsos-icon{
+	margin-left:5px;
+	margin-right:5px;
+}
+}
+
+/* MEDSOS PROPERTY ENDS HERE */
+
+/* FIXED-BOTTOM PROPERTY */
+
+.fixed-bottom{
+
+    background:white;
+	font-size:8px;
+	padding-top:10px;
+	padding-bottom:7px;
+	box-shadow: 0px 0px 13px -7px rgba(0,0,0,0.5);
+
+}
+
+.fixed-bottom .col-3{
+    padding-left:5px;
+    padding-right:5px;
+}
+
+.fixed-bottom .icon,.fixed-bottom .icon2{
+	font-size:21px;
+}
+
+.fixed-bottom .label, .fixed-bottom .icon{
+	color:#ffc107;
+}
+
+.fixed-bottom a{
+	color:#6c757d;
+	line-height:1.2rem;
+	font-size:12px;
+}
+
+.fixed-bottom a:hover{
+	color:#ffc107;
+	text-decoration:none;
+}
+
+/* FIXED-BOTTOM ENDS HERE */
+
+.btn-texas{
+    background:linear-gradient(180deg, #cc3300 65%, #8f0916 115%);
+    color:white;
+    padding-top:4px;
+    padding-bottom:5px;
+}
+
+.btn-texas:hover{
+    background:#962905;
+}
+
+/*////////MODAL////////*/
+
+.modal a{
+    font-size:14px;
+    color:#ffc107;
+}
+
+.modal .btn-secondary{
+    color:white;
+}
+
+.modal a{
+    text-decoration:none;
+}
+
+.modal .card-body{
+    padding:10px 10px 10px 10px;
+    background:#e9ecef;
+    -webkit-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	-moz-box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+	box-shadow: 2px 2px 10px -5px rgba(0,0,0,0.5);
+    transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+}
+
+.modal .card-body .judul{
+    margin-bottom:10px;
+    font-weight:600;
+    color:#ffc107;
+}
+
+.modal .hasil{
+    font-weight:600;
+    line-height:1;
+}
+
+.modal .detil{
+    font-weight:600;
+}
+
+.modal .card-body .hasil2{
+    font-size:25px;
+    font-weight:600;
+}
+
+.modal a img{
+    width:48px;
+}
+
+.modal a .wa-pos{
+    padding-top:10px;
+    padding-bottom:10px;
+}
+
+.modal a .wa-pos2{
+    padding-top:16px;
+    padding-bottom:16px;
+}
+
+.modal a .status{
+    font-size:11px;
+    color:#a79f9f;
+}
+
+.modal a .icon{
+    font-size:20px;
+    padding-top:20px;
+    padding-bottom:20px;
+    color:#ffc107;
+}

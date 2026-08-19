@@ -1,0 +1,1126 @@
+function createDataToExport(data){
+    const loaderStatus = document.getElementsByClassName("loaderStatus")[0],
+          rows = data.list,
+          rows2 = data.list2,
+          tanggalTitle = data.tanggalTitle,
+          idWarehouse = data.idWarehouse;
+
+    loaderStatus.innerText = "Creating Header";
+    console.log("Creating Header");
+
+    let totalPendapatanAll = 0,
+        totalSGDAll = 0,
+        totalRpAll = 0,
+        totalKomisiPackerAll = 0,
+        totalKomisiDriverAll = 0,
+        totalBeratAll = 0,
+        totalItemAll = 0,
+        totalCbmAll = 0,
+        totalPaidAll = 0,
+        totalUnpaidAll = 0,
+        totalDiskonAll = 0;
+    rows.forEach((r, idx) => {
+        totalPendapatanAll += parseInt(r['invoicesubtotal']),
+        totalSGDAll += parseInt(r['invoicesubtotalsgd']),
+        totalRpAll += parseInt(r['invoicesubtotalrupiah']),
+        totalKomisiPackerAll += parseInt(packerCheck(r['komisipackerbyberat'],r['packing_created_by'])),
+        totalKomisiDriverAll += parseInt(mismassDriverCheck(r['komisidriverbyberat'],r['forwarder_id'],r['track_status_id'],r['shipping_status'])),
+        totalBeratAll += parseFloat(r['invoiceweight'].toFixed(2)),
+        totalItemAll += parseInt(r['invoiceitem']),
+        totalCbmAll += parseInt(r['invoicecbm']),
+        totalPaidAll += parseInt(r['invoicepaid']),
+        totalUnpaidAll += parseInt(r['invoiceunpaid']),
+        totalDiskonAll += parseInt(r['invoicediscount']);
+    });
+    
+    const ws_data = [
+        [data.title,"","","","","","","","",""],
+        ["","","","","","","","","",""],
+        [
+            "Total Pendapatan",
+            { v: rupiah(totalPendapatanAll), t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },
+            "Total Komisi Packer",
+            { v: rupiah(totalKomisiPackerAll), t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },
+            "Total Berat Actual",
+            { v: totalBeratAll.toFixed(2), t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },
+            "Total Profit",
+            { v: rupiah(totalPaidAll-totalDiskonAll), t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },
+        ],
+        [
+            "Total Paid",
+            { v: rupiah(totalPaidAll), t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },
+            "Total Komisi Driver",
+            { v: rupiah(totalKomisiDriverAll), t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },
+            "Total Berat Pembulatan",
+            { v: pembulatan(totalBeratAll), t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },
+            "Profit sudah dikurangi UNPAID dan Diskon, belum dikurangi Komisi AE dan biaya lainnya.",
+            ""
+        ],
+        [
+            "Total Unpaid",
+            { v: rupiah(totalUnpaidAll), t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },
+            "",
+            "",
+            "Total Item/Box",
+            { v: totalItemAll, t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },
+            "",
+            ""
+        ],
+        [
+            "Total Diskon",
+            { v: rupiah(totalDiskonAll), t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },
+            "",
+            "",
+            "Total CBM",
+            { v: totalCbmAll.toFixed(2), t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },
+            "",
+            ""
+        ],
+        [
+            "",
+            "",
+            "",
+            "",
+            "Total CBM (kgs)",
+            { v: totalCbmAll.toFixed(2)*100, t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },
+            "",
+            ""
+        ],
+        ["","","","","","","","","",""],
+        [{ v: 'Total Pendapatan Dalam Mata Uang (Bruto)', t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },"","","","","","","","",""],
+        ["Rupiah",{ v: rupiah(totalRpAll), t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },"","","","","","","",""],
+        ["Dollar Singapore",{ v: dollarSG(totalSGDAll), t: 's', s: {font: {bold: true, color: {rgb: '000000'}}} },"","","","","","","",""],
+        ["","","","","","","","","",""],
+        ["Data Shipment Periode "+tanggalTitle,"","","","",{ v: " (Berdasarkan Tanggal Create Invoice)", t: 's', s: {font: {bold: true, sz: 18,color: {rgb: '008000'}}} },"","","","",""],
+        getHeaderColumnCOR(idWarehouse)
+    ];
+
+    let merge = getMergeHeader(idWarehouse);
+
+    let arrayGetBodyColumn = {
+        "rows" : rows,
+        "rows2" : rows2,
+        "idWarehouse" : idWarehouse,
+        "ws_data" : ws_data,
+        "merge" : merge,
+        "dataTitle" : data.title,
+        "corType" : data.corType
+    };
+    getBodyColumnCOR(arrayGetBodyColumn);
+}
+
+function getHeaderColumnCOR(idWarehouse){
+    if(idWarehouse=="ALL WAREHOUSE"){
+        return [
+            { v: 'No.', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'No. Invoice', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} }, 
+            { v: 'Tanggal Create Invoice', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} }, 
+            { v: 'Pembayaran', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Create Resi By', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Reference', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Data Client', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Warehouse', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Sub Total Berat Actual (Kg)', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            "",
+            { v: 'Sub Total Berat (Kg)', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Sub Total Item/Box', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Sub Total CBM', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Sub Total CBM (Kgs)', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Sub Total Harga Service', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Sub Total Additional', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Sub Total Diskon', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Sub Total Jumlah', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Adjustment Fee', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Sub Total Total Biaya', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Sub Total Total SGD', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Sub Total Komisi Packer', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Sub Total Komisi Driver', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Sub Total Profit', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        ]
+    }
+
+    return [
+        { v: 'No.', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'No. Invoice', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} }, 
+        { v: 'Tanggal Create Invoice', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} }, 
+        { v: 'Pembayaran', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Create Resi By', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Reference', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Data Client', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Sub Total Berat Actual (Kg)', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        "",
+        { v: 'Sub Total Berat (Kg)', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Sub Total Item/Box', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Sub Total CBM', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Sub Total CBM (Kgs)', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Sub Total Harga Service', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Sub Total Additional', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Sub Total Diskon', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Sub Total Jumlah', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Adjustment Fee', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Sub Total Total Biaya', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Sub Total Total SGD', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Sub Total Komisi Packer', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Sub Total Komisi Driver', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        { v: 'Sub Total Profit', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+    ];
+}
+
+function getMergeHeader(idWarehouse){
+    if(idWarehouse=="ALL WAREHOUSE"){
+        return [
+            { s: { r: 0, c: 0 }, e: { r: 0, c: 23 } },
+            { s: { r: 3, c: 6 }, e: { r: 5, c: 7 } },
+            { s: { r: 8, c: 0 }, e: { r: 8, c: 9 } },
+            { s: { r: 12, c: 0 }, e: { r: 12, c: 4 } },
+            { s: { r: 12, c: 5 }, e: { r: 12, c: 23 } },
+            { s: { r: 13, c: 8 }, e: { r: 13, c: 9 } },
+        ];
+    }
+
+    return [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 22 } },
+        { s: { r: 3, c: 6 }, e: { r: 5, c: 7 } },
+        { s: { r: 8, c: 0 }, e: { r: 8, c: 9 } },
+        { s: { r: 12, c: 0 }, e: { r: 12, c: 4 } },
+        { s: { r: 12, c: 5 }, e: { r: 12, c: 22 } },
+        { s: { r: 13, c: 7 }, e: { r: 13, c: 8 } },
+    ];
+}
+
+function getBodyColumnCOR(array){
+    if(array['idWarehouse']=="ALL WAREHOUSE"){
+        allBodyColumnCOR(array);
+    }else{
+        nonAllBodyColumnCOR(array);
+    }
+}
+
+function allBodyColumnCOR(array){
+    const loaderStatus = document.getElementsByClassName("loaderStatus")[0];
+
+    let num = 1,
+        invData, komisiDriver, komisiPacker,
+        mergeNumFirst = 14,
+        rows = array['rows'],
+        rows2 = array['rows2'],
+        ws_data = array['ws_data'],
+        merge = array['merge'],
+        dataTitle = array['dataTitle'],
+        corType = array['corType'],
+        dataLength = rows.length,
+        dataLength2 = rows2.length;
+        
+    rows.forEach((r, idx) => {
+        loaderStatus.innerText = "Exporting "+(num)+" / "+dataLength;
+        console.log("Exporting "+(num)+" / "+dataLength);
+
+        komisiPacker = packerCheck(r['komisipackerbyberat'],r['packing_created_by']);
+        komisiDriver = mismassDriverCheck(r['komisidriverbyberat'],r['forwarder_id'],r['track_status_id'],r['shipping_status']);
+        invData = {
+            "bank_name" : r['bank_name'],
+            "invoice_status" : r['invoice_status'],
+            "payment_success_at" : r['payment_success_at'],
+            "payment_success_auto_at" : r['payment_success_auto_at'],
+            "shipping_created_at" : r['shipping_created_at']
+        };
+
+        ws_data.push([
+            { v: num, t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}}, 
+            { v: r['mismass_invoice_id'], t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleTop}},
+            { v: dateFormatCustom(r['created_at'],2), t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleTop} },
+            invoiceStatus(r['invoice_status']),
+            { v: r['shipping_created_by'], t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleTop} },
+            { v: r['reffullname'], t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleTop} },
+            { v: r['sender_first_name']+" "+r['sender_middle_name']+" "+r['sender_last_name'], t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleTop} },
+            { v: r['wareid']+" - "+r['warename'], t: 's', s: {font: {bold: true, color: {rgb: '000000'}},alignment:{vertical:"center",horizontal:"center"},border:borderStyleTop} },
+            { v: parseFloat(r['invoiceweight']).toFixed(2), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            "",
+            { v: pembulatan(r['invoiceweight']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: r['invoiceitem'], t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: r['invoicecbm'].toFixed(2), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: parseFloat(r['invoicecbm'].toFixed(2))*100, t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(parseInt(r['invoicesubtotal'])-parseInt(r['invoiceadtfee'])-parseInt(r['invoiceadditional'])+parseInt(r['invoicediscount'])), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(r['invoiceadditional']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(r['invoicediscount']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(parseInt(r['invoicesubtotal'])-parseInt(r['invoiceadtfee'])), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(r['invoiceadtfee']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(r['invoicesubtotal']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: dollarSG(r['invoicesubtotalsgd']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(komisiPacker), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(komisiDriver), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(parseInt(r['invoicesubtotal'])-parseInt(komisiPacker)-parseInt(komisiDriver)), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+        ],
+        [
+            { v: "", t: 's', s: {border:borderStyleMid}}, 
+            { v: dateFormatCustom(r['invoicedate'],0), t: 's', s: {border:borderStyleMid}},
+            { v: dateFormatCustom(r['created_at'],3), t: 's', s: {border:borderStyleMid}},
+            invoicePaidDate(invData),
+            { v: dateFormatCustom(r['shipping_created_at'],0), t: 's', s: {border:borderStyleMid}},
+            customerType(r['jumlahkirim']),
+            { v: r['sender_phone'], t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}}
+        ],
+        [
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { f: `HYPERLINK("${location.origin}/p/${r['mismass_invoice_link']}", "Link Invoice")`,t: 's', s: {border:borderStyleBot} },
+            { v: "By : "+r['created_by'], t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: r['sender_district']+", "+r['sender_city'], t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            ""
+        ]
+        );
+
+        let stepOne = allBodyCorTypeStepOne(r,corType,ws_data);
+        ws_data = stepOne['ws_data'];
+
+        let mergeRow = [{ s: { r: mergeNumFirst, c: 0 }, e: { r: (mergeNumFirst+2), c: 0 } },
+            { s: { r: mergeNumFirst, c: 7 }, e: { r: (mergeNumFirst+2), c: 7 } },
+            { s: { r: mergeNumFirst, c: 8 }, e: { r: (mergeNumFirst+2), c: 9 } },
+            { s: { r: mergeNumFirst, c: 10 }, e: { r: (mergeNumFirst+2), c: 10 } },
+            { s: { r: mergeNumFirst, c: 11 }, e: { r: (mergeNumFirst+2), c: 11 } },
+            { s: { r: mergeNumFirst, c: 12 }, e: { r: (mergeNumFirst+2), c: 12 } },
+            { s: { r: mergeNumFirst, c: 13 }, e: { r: (mergeNumFirst+2), c: 13 } },
+            { s: { r: mergeNumFirst, c: 14 }, e: { r: (mergeNumFirst+2), c: 14 } },
+            { s: { r: mergeNumFirst, c: 15 }, e: { r: (mergeNumFirst+2), c: 15 } },
+            { s: { r: mergeNumFirst, c: 16 }, e: { r: (mergeNumFirst+2), c: 16 } },
+            { s: { r: mergeNumFirst, c: 17 }, e: { r: (mergeNumFirst+2), c: 17 } },
+            { s: { r: mergeNumFirst, c: 18 }, e: { r: (mergeNumFirst+2), c: 18 } },
+            { s: { r: mergeNumFirst, c: 19 }, e: { r: (mergeNumFirst+2), c: 19 } },
+            { s: { r: mergeNumFirst, c: 20 }, e: { r: (mergeNumFirst+2), c: 20 } },
+            { s: { r: mergeNumFirst, c: 21 }, e: { r: (mergeNumFirst+2), c: 21 } },
+            { s: { r: mergeNumFirst, c: 22 }, e: { r: (mergeNumFirst+2), c: 22 } },
+            { s: { r: mergeNumFirst, c: 23 }, e: { r: (mergeNumFirst+2), c: 23 } },
+            ...allBodyCorTypeStepTwo(mergeNumFirst,corType)];
+
+        mergeRow.forEach(d => {
+            merge.push(d);
+        });
+
+        //Row2
+        let arrayStepThree = {
+            "r" : r,
+            "rows2" : rows2,
+            "merge" : merge,
+            "mergeNumFirst" : mergeNumFirst,
+            "corType" : corType,
+            "ws_data" : ws_data
+        },stepThree = allBodyCorTypeStepThree(arrayStepThree);
+        mergeNumFirst = stepThree['mergeNumFirst'];
+        merge = stepThree['merge'];
+        num++;
+
+    });
+
+    loaderStatus.innerText = "Finishing Create Data Export";
+    console.log("Finishing Create Data Export");
+
+    console.log(ws_data);
+    
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+    ws['!merges'] = merge;
+    
+    if(!ws['A1']) ws['A1'] = {}; // Ensure cell A1 exists
+    ws['A1'].s = {
+        font: {
+            name: 'Calibri', // Optional: specify font name
+            sz: 18,           // Set font size to 24 points
+            bold: true,       // Optional: make it bold
+            color: { rgb: "000000" } // Optional: set font color
+        }
+    };
+
+    if(!ws['A13']) ws['A13'] = {}; // Ensure cell A13 exists
+    ws['A13'].s = {
+        font: {
+            name: 'Calibri', // Optional: specify font name
+            sz: 18,           // Set font size to 24 points
+            bold: true,       // Optional: make it bold
+            color: { rgb: "000000" } // Optional: set font color
+        }
+    };
+
+    // Object.keys(ws).forEach(cell => {
+    // 	if (cell[0] === "!") return; // skip meta
+    // 	if (cell.match(/^E\d+$/)) {  
+    // 	if (!ws[cell].s) ws[cell].s = {};
+    // 	ws[cell].s.alignment = { wrapText: true };
+    // 	}
+    // });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    XLSX.writeFile(wb, dataTitle+".xlsx");
+
+    loaderStatus.innerText = "Create Export Data Success";
+    console.log("Create Export Data Success");
+}
+
+function allBodyCorTypeStepOne(r,corType,ws_data){
+    if(corType=="ALL"){
+        ws_data.push([
+            { v: "Rincian Detil Penerima | Tanggal Resi : "+dateFormatCustom(r['shipping_created_at'],2), t: 's', s: {fill:{fgColor:{rgb:'808080'}},border:borderStyle}}, 
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]);
+
+        ws_data.push([
+            { v: 'No.', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'No. Resi', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} }, 
+            { v: 'Data Customer', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            "",
+            "",
+            "",
+            { v: 'Service', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            "",
+            { v: 'Harga Satuan', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Berat Actual (Kg)', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Berat (Kg)', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Item/Box', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'CBM', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'CBM (Kgs)', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Harga Service', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Additional', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Diskon', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Total Biaya', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            "",
+            "",
+            { v: 'Total SGD', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Komisi Packer', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Komisi Driver', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            { v: 'Profit', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+        ]);
+
+        return {
+            "ws_data" : ws_data
+        }
+    }
+
+    return {
+        "ws_data" : ws_data
+    }
+}
+
+function allBodyCorTypeStepTwo(mergeNumFirst,corType){
+    if(corType=="ALL"){
+        return [{ s: { r: (mergeNumFirst+3), c: 0 }, e: { r: (mergeNumFirst+3), c: 23 } },
+                { s: { r: (mergeNumFirst+4), c: 2 }, e: { r: (mergeNumFirst+4), c: 5 } },
+                { s: { r: (mergeNumFirst+4), c: 6 }, e: { r: (mergeNumFirst+4), c: 7 } },
+                { s: { r: (mergeNumFirst+4), c: 17 }, e: { r: (mergeNumFirst+4), c: 19 } }];
+    }
+    return [];
+}
+
+function allBodyCorTypeStepThree(array){
+    if(array['corType']=="ALL"){
+        let num2 = 1,
+            komisiDriver2,
+            komisiPacker2,
+            subTotalSGD,
+            driverByData,
+            driverAtData,
+            r = array['r'],
+            rows2 = array['rows2'],
+            merge = array['merge'],
+            mergeNumFirst = array['mergeNumFirst'],
+            ws_data = array['ws_data'];
+
+        rows2.forEach((r2, idx2) => {
+
+            if(r2['mismass_invoice_id']==r['mismass_invoice_id']){
+
+            komisiPacker2 = packerCheck(r2['komisipackerbyberat'],r2['packing_created_by']);
+            komisiDriver2 = mismassDriverCheck(r2['komisidriverbyberat'],r2['forwarder_id'],r2['track_status_id'],r2['shipping_status']);
+            subTotalSGD = r2['fc_symbol']=="SGD"?r2['sub_total']/r2['fc_value']:0;
+
+            driverByData = {
+                "forwarder_id" : r2['forwarder_id'],
+                "forwarder_name" : r2['forwarder_name'],
+                "track_status_id" : r2['track_status_id'],
+                "shipping_status" : r2['shipping_status'],
+                "shipping_success_by" : r2['shipping_success_by'],
+                "shipping_updated_by" : r2['shipping_updated_by'],
+            }
+
+            driverAtData = {
+                "forwarder_id" : r2['forwarder_id'],
+                "track_status_id" : r2['track_status_id'],
+                "shipping_status" : r2['shipping_status'],
+                "shipping_success_at" : r2['shipping_success_at'],
+                "shipping_updated_at" : r2['shipping_updated_at'],
+            }
+
+            ws_data.push(
+                [
+                    { v: num2, t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}}, 
+                    showForwarder(r2['forwarder_id'],r2['forwarder_name']),
+                    { v: r2['cons_first_name']+" "+r2['cons_middle_name']+" "+r2['cons_last_name'], t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleTop} },
+                    "",
+                    "",
+                    { v: "", t: 's', s: {border:borderStyleTop} },
+                    { v: r2['service_name'], t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                    "",
+                    { v: rupiah(r2['service_price_per']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                    { v: parseFloat(r2['weight']).toFixed(2), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                    { v: Math.round(r2['weight']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                    { v: r2['item'], t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                    { v: r2['cbm'].toFixed(2), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                    { v: parseFloat(r2['cbm'].toFixed(2))*100, t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                    { v: rupiah(parseInt(r2['sub_total'])-parseInt(r2['additional'])+parseInt(r2['discount'])), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                    { v: rupiah(r2['additional']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                    { v: rupiah(r2['discount']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                    { v: rupiah(r2['sub_total']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                    "",
+                    "",
+                    { v: dollarSG(subTotalSGD), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                    { v: rupiah(komisiPacker2), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyleTop}},
+                    { v: rupiah(komisiDriver2), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyleTop}},
+                    { v: rupiah(parseInt(r2['sub_total'])-parseInt(komisiPacker2)-parseInt(komisiDriver2)), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                ],
+                [
+                    { v: "", t: 's', s: {border:borderStyleMid} }, 
+                    { v: r2['shipping_number'], t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleMid} },
+                    { v: r2['cons_phone'], t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                    packerBy(r2['packing_created_by']),
+                    mismassDriverBy(driverByData),
+                    { v: "", t: 's', s: {border:borderStyleMid} },
+                ],
+                [
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: dateFormatCustom(r2['shipping_created_at'],0), t: 's', s: {border: borderStyleBot} },
+                    { v: r2['cons_district']+", "+r2['cons_city'], t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                    packerAt(r2['packing_created_by'],r2['packing_created_at']),
+                    mismassDriverAt(driverAtData),
+                    { v: "", t: 's', s: {border: borderStyleBot} },
+                ],
+            );
+
+            let mergeRow = [
+                { s: { r: mergeNumFirst+2+(num2*3), c: 0 }, e: { r: mergeNumFirst+4+(num2*3), c: 0 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 2 }, e: { r: mergeNumFirst+2+(num2*3), c: 5 } },
+                { s: { r: mergeNumFirst+3+(num2*3), c: 2 }, e: { r: mergeNumFirst+3+(num2*3), c: 5 } },
+                { s: { r: mergeNumFirst+4+(num2*3), c: 2 }, e: { r: mergeNumFirst+4+(num2*3), c: 5 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 6 }, e: { r: mergeNumFirst+4+(num2*3), c: 7 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 8 }, e: { r: mergeNumFirst+4+(num2*3), c: 8 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 9 }, e: { r: mergeNumFirst+4+(num2*3), c: 9 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 10 }, e: { r: mergeNumFirst+4+(num2*3), c: 10 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 11 }, e: { r: mergeNumFirst+4+(num2*3), c: 11 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 12 }, e: { r: mergeNumFirst+4+(num2*3), c: 12 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 13 }, e: { r: mergeNumFirst+4+(num2*3), c: 13 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 14 }, e: { r: mergeNumFirst+4+(num2*3), c: 14 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 15 }, e: { r: mergeNumFirst+4+(num2*3), c: 15 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 16 }, e: { r: mergeNumFirst+4+(num2*3), c: 16 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 17 }, e: { r: mergeNumFirst+4+(num2*3), c: 19 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 20 }, e: { r: mergeNumFirst+4+(num2*3), c: 20 } },
+                { s: { r: mergeNumFirst+2+(num2*3), c: 23 }, e: { r: mergeNumFirst+4+(num2*3), c: 23 } },
+            ];
+        
+            mergeRow.forEach(d => {
+                merge.push(d);
+            });
+
+            num2++;
+
+            }
+
+        });
+
+        //Penutup
+        ws_data.push(
+            [
+                { v: "", t: 's', s: {fill:{fgColor:{rgb:'FFFF00'}},border:borderStyle}}, 
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                { v: "", t: 's', s: {border: borderStyleBot} },
+            ],
+        );
+
+        let mergeRow2 = [
+            { s: { r: mergeNumFirst+5+((num2-1)*3), c: 0 }, e: { r: mergeNumFirst+5+((num2-1)*3), c: 23 } },
+        ];
+
+        mergeRow2.forEach(d => {
+            merge.push(d);
+        });
+
+        mergeNumFirst+=6+((num2-1)*3);
+
+        return {
+            "merge" : merge,
+            "mergeNumFirst" : mergeNumFirst
+        };
+    }
+
+    return {
+            "merge" : array['merge'],
+            "mergeNumFirst" : array['mergeNumFirst']+=3
+        };
+}
+
+function nonAllBodyColumnCOR(array){
+    const loaderStatus = document.getElementsByClassName("loaderStatus")[0];
+
+    let num = 1,
+        invData, komisiDriver, komisiPacker,
+        mergeNumFirst = 14,
+        rows = array['rows'],
+        rows2 = array['rows2'],
+        ws_data = array['ws_data'],
+        merge = array['merge'],
+        dataTitle = array['dataTitle'],
+        corType = array['corType'],
+        dataLength = rows.length,
+        dataLength2 = rows2.length;
+
+    rows.forEach((r, idx) => {
+        loaderStatus.innerText = "Exporting "+(num)+" / "+dataLength;
+        console.log("Exporting "+(num)+" / "+dataLength);
+
+        komisiPacker = packerCheck(r['komisipackerbyberat'],r['packing_created_by']);
+        komisiDriver = mismassDriverCheck(r['komisidriverbyberat'],r['forwarder_id'],r['track_status_id'],r['shipping_status']);
+        invData = {
+            "bank_name" : r['bank_name'],
+            "invoice_status" : r['invoice_status'],
+            "payment_success_at" : r['payment_success_at'],
+            "payment_success_auto_at" : r['payment_success_auto_at'],
+            "shipping_created_at" : r['shipping_created_at']
+        };
+
+        ws_data.push([
+            { v: num, t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}}, 
+            { v: r['mismass_invoice_id'], t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleTop}},
+            { v: dateFormatCustom(r['created_at'],2), t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleTop} },
+            invoiceStatus(r['invoice_status']),
+            { v: r['shipping_created_by'], t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleTop} },
+            { v: r['reffullname'], t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleTop} },
+            { v: r['sender_first_name']+" "+r['sender_middle_name']+" "+r['sender_last_name'], t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleTop} },
+            { v: parseFloat(r['invoiceweight']).toFixed(2), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            "",
+            { v: pembulatan(r['invoiceweight']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: r['invoiceitem'], t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: r['invoicecbm'].toFixed(2), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: parseFloat(r['invoicecbm'].toFixed(2))*100, t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(parseInt(r['invoicesubtotal'])-parseInt(r['invoiceadtfee'])-parseInt(r['invoiceadditional'])+parseInt(r['invoicediscount'])), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(r['invoiceadditional']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(r['invoicediscount']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(parseInt(r['invoicesubtotal'])-parseInt(r['invoiceadtfee'])), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(r['invoiceadtfee']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(r['invoicesubtotal']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: dollarSG(r['invoicesubtotalsgd']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(komisiPacker), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(komisiDriver), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            { v: rupiah(parseInt(r['invoicesubtotal'])-parseInt(komisiPacker)-parseInt(komisiDriver)), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+        ],
+        [
+            { v: "", t: 's', s: {border:borderStyleMid}}, 
+            { v: dateFormatCustom(r['invoicedate'],0), t: 's', s: {border:borderStyleMid}},
+            { v: dateFormatCustom(r['created_at'],3), t: 's', s: {border:borderStyleMid}},
+            invoicePaidDate(invData),
+            { v: dateFormatCustom(r['shipping_created_at'],0), t: 's', s: {border:borderStyleMid}},
+            customerType(r['jumlahkirim']),
+            { v: r['sender_phone'], t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}},
+            { v: "", t: 's', s: {border:borderStyleMid}}
+        ],
+        [
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { f: `HYPERLINK("${location.origin}/p/${r['mismass_invoice_link']}", "Link Invoice")`,t: 's', s: {border:borderStyleBot} },
+            { v: "By : "+r['created_by'], t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: r['sender_district']+", "+r['sender_city'], t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            { v: "", t: 's', s: {border:borderStyleBot}},
+            ""
+        ]
+        );
+
+        let stepOne = notAllBodyCorTypeStepOne(r,corType,ws_data);
+        ws_data = stepOne['ws_data'];
+
+        let mergeRow = [{ s: { r: mergeNumFirst, c: 0 }, e: { r: (mergeNumFirst+2), c: 0 } },
+            { s: { r: mergeNumFirst, c: 7 }, e: { r: (mergeNumFirst+2), c: 8 } },
+            { s: { r: mergeNumFirst, c: 9 }, e: { r: (mergeNumFirst+2), c: 9 } },
+            { s: { r: mergeNumFirst, c: 10 }, e: { r: (mergeNumFirst+2), c: 10 } },
+            { s: { r: mergeNumFirst, c: 11 }, e: { r: (mergeNumFirst+2), c: 11 } },
+            { s: { r: mergeNumFirst, c: 12 }, e: { r: (mergeNumFirst+2), c: 12 } },
+            { s: { r: mergeNumFirst, c: 13 }, e: { r: (mergeNumFirst+2), c: 13 } },
+            { s: { r: mergeNumFirst, c: 14 }, e: { r: (mergeNumFirst+2), c: 14 } },
+            { s: { r: mergeNumFirst, c: 15 }, e: { r: (mergeNumFirst+2), c: 15 } },
+            { s: { r: mergeNumFirst, c: 16 }, e: { r: (mergeNumFirst+2), c: 16 } },
+            { s: { r: mergeNumFirst, c: 17 }, e: { r: (mergeNumFirst+2), c: 17 } },
+            { s: { r: mergeNumFirst, c: 18 }, e: { r: (mergeNumFirst+2), c: 18 } },
+            { s: { r: mergeNumFirst, c: 19 }, e: { r: (mergeNumFirst+2), c: 19 } },
+            { s: { r: mergeNumFirst, c: 20 }, e: { r: (mergeNumFirst+2), c: 20 } },
+            { s: { r: mergeNumFirst, c: 21 }, e: { r: (mergeNumFirst+2), c: 21 } },
+            { s: { r: mergeNumFirst, c: 22 }, e: { r: (mergeNumFirst+2), c: 22 } },
+            ...notAllBodyCorTypeStepTwo(mergeNumFirst,corType)];
+
+        mergeRow.forEach(d => {
+            merge.push(d);
+        });
+
+    //Row2
+    let arrayStepThree = {
+            "r" : r,
+            "rows2" : rows2,
+            "merge" : merge,
+            "mergeNumFirst" : mergeNumFirst,
+            "corType" : corType,
+            "ws_data" : ws_data
+        },stepThree = notAllBodyCorTypeStepThree(arrayStepThree);
+        mergeNumFirst = stepThree['mergeNumFirst'];
+        merge = stepThree['merge'];
+        num++;
+
+    });
+
+    loaderStatus.innerText = "Finishing Create Data Export";
+    console.log("Finishing Create Data Export");
+    
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+    ws['!merges'] = merge;
+    
+    if(!ws['A1']) ws['A1'] = {}; // Ensure cell A1 exists
+    ws['A1'].s = {
+        font: {
+            name: 'Calibri', // Optional: specify font name
+            sz: 18,           // Set font size to 24 points
+            bold: true,       // Optional: make it bold
+            color: { rgb: "000000" } // Optional: set font color
+        }
+    };
+
+    if(!ws['A13']) ws['A13'] = {}; // Ensure cell A13 exists
+    ws['A13'].s = {
+        font: {
+            name: 'Calibri', // Optional: specify font name
+            sz: 18,           // Set font size to 24 points
+            bold: true,       // Optional: make it bold
+            color: { rgb: "000000" } // Optional: set font color
+        }
+    };
+
+    // Object.keys(ws).forEach(cell => {
+    // 	if (cell[0] === "!") return; // skip meta
+    // 	if (cell.match(/^E\d+$/)) {  
+    // 	if (!ws[cell].s) ws[cell].s = {};
+    // 	ws[cell].s.alignment = { wrapText: true };
+    // 	}
+    // });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    XLSX.writeFile(wb, dataTitle+".xlsx");
+
+    loaderStatus.innerText = "Create Export Data Success";
+    console.log("Create Export Data Success");
+
+}
+
+function notAllBodyCorTypeStepOne(r,corType,ws_data){
+    if(corType=="ALL"){
+        ws_data.push([
+                { v: "Rincian Detil Penerima | Tanggal Resi : "+dateFormatCustom(r['shipping_created_at'],2), t: 's', s: {fill:{fgColor:{rgb:'808080'}},border:borderStyle}}, 
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                ""
+            ]);
+        ws_data.push(
+            [
+                { v: 'No.', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'No. Resi', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} }, 
+                { v: 'Data Customer', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                "",
+                "",
+                "",
+                { v: 'Service', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'Harga Satuan', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'Berat Actual (Kg)', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'Berat (Kg)', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'Item/Box', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'CBM', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'CBM (Kgs)', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'Harga Service', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'Additional', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'Diskon', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'Total Biaya', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                "",
+                "",
+                { v: 'Total SGD', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'Komisi Packer', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'Komisi Driver', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+                { v: 'Profit', t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyle} },
+            ]
+        );
+
+        return {
+            "ws_data" : ws_data
+        }
+    }
+
+    return {
+        "ws_data" : ws_data
+    }
+}
+
+function notAllBodyCorTypeStepTwo(mergeNumFirst,corType){
+    if(corType=="ALL"){
+        return [{ s: { r: (mergeNumFirst+3), c: 0 }, e: { r: (mergeNumFirst+3), c: 22 } },
+            { s: { r: (mergeNumFirst+4), c: 2 }, e: { r: (mergeNumFirst+4), c: 5 } },
+            { s: { r: (mergeNumFirst+4), c: 16 }, e: { r: (mergeNumFirst+4), c: 18 } }];
+    }
+    return [];
+}
+
+function notAllBodyCorTypeStepThree(array){
+    if(array['corType']=="ALL"){
+        let num2 = 1,
+        komisiDriver2,
+        komisiPacker2,
+        subTotalSGD,
+        driverByData,
+        driverAtData,
+        r = array['r'],
+        rows2 = array['rows2'],
+        merge = array['merge'],
+        mergeNumFirst = array['mergeNumFirst'],
+        ws_data = array['ws_data'];
+
+    rows2.forEach((r2, idx2) => {
+
+        if(r2['mismass_invoice_id']==r['mismass_invoice_id']){
+
+        komisiPacker2 = packerCheck(r2['komisipackerbyberat'],r2['packing_created_by']);
+        komisiDriver2 = mismassDriverCheck(r2['komisidriverbyberat'],r2['forwarder_id'],r2['track_status_id'],r2['shipping_status']);
+        subTotalSGD = r2['fc_symbol']=="SGD"?r2['sub_total']/r2['fc_value']:0;
+
+        driverByData = {
+            "forwarder_id" : r2['forwarder_id'],
+            "forwarder_name" : r2['forwarder_name'],
+            "track_status_id" : r2['track_status_id'],
+            "shipping_status" : r2['shipping_status'],
+            "shipping_success_by" : r2['shipping_success_by'],
+            "shipping_updated_by" : r2['shipping_updated_by'],
+        }
+
+        driverAtData = {
+            "forwarder_id" : r2['forwarder_id'],
+            "track_status_id" : r2['track_status_id'],
+            "shipping_status" : r2['shipping_status'],
+            "shipping_success_at" : r2['shipping_success_at'],
+            "shipping_updated_at" : r2['shipping_updated_at'],
+        }
+
+        ws_data.push(
+            [
+                { v: num2, t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}}, 
+                showForwarder(r2['forwarder_id'],r2['forwarder_name']),
+                { v: r2['cons_first_name']+" "+r2['cons_middle_name']+" "+r2['cons_last_name'], t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleTop} },
+                "",
+                "",
+                { v: "", t: 's', s: {border:borderStyleTop} },
+                { v: r2['service_name'], t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                { v: rupiah(r2['service_price_per']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                { v: parseFloat(r2['weight']).toFixed(2), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                { v: Math.round(r2['weight']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                { v: r2['item'], t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                { v: r2['cbm'].toFixed(2), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                { v: parseFloat(r2['cbm'].toFixed(2))*100, t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                { v: rupiah(parseInt(r2['sub_total'])-parseInt(r2['additional'])+parseInt(r2['discount'])), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                { v: rupiah(r2['additional']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                { v: rupiah(r2['discount']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                { v: rupiah(r2['sub_total']), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                "",
+                "",
+                { v: dollarSG(subTotalSGD), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+                { v: rupiah(komisiPacker2), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyleTop}},
+                { v: rupiah(komisiDriver2), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyleTop}},
+                { v: rupiah(parseInt(r2['sub_total'])-parseInt(komisiPacker2)-parseInt(komisiDriver2)), t: 's', s: {alignment:{vertical:"center",horizontal:"center"},border:borderStyle}},
+            ],
+            [
+                { v: "", t: 's', s: {border:borderStyleMid} }, 
+                { v: r2['shipping_number'], t: 's', s: {font: {bold: true, color: {rgb: '000000'}},border:borderStyleMid} },
+                { v: r2['cons_phone'], t: 's', s: {border:borderStyleMid} },
+                { v: "", t: 's', s: {border:borderStyleMid} },
+                { v: "", t: 's', s: {border:borderStyleMid} },
+                { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+                packerBy(r2['packing_created_by']),
+                mismassDriverBy(driverByData),
+                 { v: "", t: 's', s: {border:borderStyleMid} },
+            ],
+            [
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: dateFormatCustom(r2['shipping_created_at'],0), t: 's', s: {border: borderStyleBot} },
+                { v: r2['cons_district']+", "+r2['cons_city'], t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                { v: "", t: 's', s: {border: borderStyleBot} },
+                packerAt(r2['packing_created_by'],r2['packing_created_at']),
+                mismassDriverAt(driverAtData),
+                { v: "", t: 's', s: {border: borderStyleBot} },
+            ],
+        );
+
+        let mergeRow = [
+            { s: { r: mergeNumFirst+2+(num2*3), c: 0 }, e: { r: mergeNumFirst+4+(num2*3), c: 0 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 2 }, e: { r: mergeNumFirst+2+(num2*3), c: 5 } },
+            { s: { r: mergeNumFirst+3+(num2*3), c: 2 }, e: { r: mergeNumFirst+3+(num2*3), c: 5 } },
+            { s: { r: mergeNumFirst+4+(num2*3), c: 2 }, e: { r: mergeNumFirst+4+(num2*3), c: 5 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 6 }, e: { r: mergeNumFirst+4+(num2*3), c: 6 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 7 }, e: { r: mergeNumFirst+4+(num2*3), c: 7 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 8 }, e: { r: mergeNumFirst+4+(num2*3), c: 8 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 9 }, e: { r: mergeNumFirst+4+(num2*3), c: 9 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 10 }, e: { r: mergeNumFirst+4+(num2*3), c: 10 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 11 }, e: { r: mergeNumFirst+4+(num2*3), c: 11 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 12 }, e: { r: mergeNumFirst+4+(num2*3), c: 12 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 13 }, e: { r: mergeNumFirst+4+(num2*3), c: 13 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 14 }, e: { r: mergeNumFirst+4+(num2*3), c: 14 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 15 }, e: { r: mergeNumFirst+4+(num2*3), c: 15 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 16 }, e: { r: mergeNumFirst+4+(num2*3), c: 18 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 19 }, e: { r: mergeNumFirst+4+(num2*3), c: 19 } },
+            { s: { r: mergeNumFirst+2+(num2*3), c: 22 }, e: { r: mergeNumFirst+4+(num2*3), c: 22 } },
+        ];
+    
+        mergeRow.forEach(d => {
+            merge.push(d);
+        });
+
+        num2++;
+
+        }
+
+    });
+
+    //Penutup
+    ws_data.push(
+        [
+            { v: "", t: 's', s: {fill:{fgColor:{rgb:'FFFF00'}},border:borderStyle}}, 
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            { v: "", t: 's', s: {border: borderStyleBot} },
+        ],
+    );
+
+        let mergeRow2 = [
+            { s: { r: mergeNumFirst+5+((num2-1)*3), c: 0 }, e: { r: mergeNumFirst+5+((num2-1)*3), c: 22 } },
+        ];
+
+        mergeRow2.forEach(d => {
+            merge.push(d);
+        });
+
+        mergeNumFirst+=6+((num2-1)*3);
+
+        return {
+            "merge" : merge,
+            "mergeNumFirst" : mergeNumFirst
+        };
+    }
+
+    return {
+            "merge" : array['merge'],
+            "mergeNumFirst" : array['mergeNumFirst']+=3
+        };
+}

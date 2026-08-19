@@ -1,0 +1,7 @@
+.select2-container--default .select2-selection--single{
+    height:100%;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow{
+    top:6px;
+}
