@@ -16,12 +16,28 @@ $("input[name='sameSender']").on("click",function(){
     }
 });
 
+let tncViewed = false;
+
+$("#tncModal").on("hidden.bs.modal", function () {
+    tncViewed = true;
+});
+
+$("#agreeTnc").on("change", function () {
+    if ($(this).is(":checked") && !tncViewed) {
+        $(this).prop("checked", false);
+        $("#tncModal").modal("show");
+    }
+});
+
 $("#formOrder").validate({
     errorClass: "error fail-alert is-invalid",
     rules:{
         email:{
             required:true,
             email:true,
+        },
+        agreeTnc:{
+            required:true,
         },
     },
     messages: {
@@ -43,6 +59,14 @@ $("#formOrder").validate({
         secondKodeNegara: "Pilih Salah Satu",
         secondPhone: "Tidak Boleh Kosong",
         knowFrom : "Pilih Salah Satu",
+        agreeTnc: "Anda harus membaca dan menyetujui Syarat & Ketentuan terlebih dahulu",
+    },
+    errorPlacement: function(error, element) {
+        if (element.attr("name") === "agreeTnc") {
+            error.insertAfter(element.closest(".form-check"));
+        } else {
+            error.insertAfter(element);
+        }
     },
     submitHandler: function(form) {
 
@@ -69,6 +93,8 @@ $("#formOrder").validate({
                 $("input[name='sameSender']").attr("checked",false);
                 $("input[name='secondName'],input[name='secondPhone']").attr("readonly",false).attr("required",true);
                 $('#secondKodeNegara').val("").trigger("change").attr("required",true).removeAttr("readonly");
+                $("#agreeTnc").prop("checked",false);
+                tncViewed = false;
                 $("#"+form.id+" input").val("");
 
                 window.location !== window.parent.location ? window.parent.postMessage(json, "*") : (json.status == "Success" ? Swal.fire(json.status, json.text, 'success') : ( json.noAdmin == null ? Swal.fire(json.status, json.text, 'error') : Swal.fire({

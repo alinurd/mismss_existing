@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ url('assets/plugins/bootstrap/css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{ url('assets/plugins/sweetalert2/sweetalert2.min.css')}}">
-    <link rel="stylesheet" href="{{ url('assets/plugins/select2/css/select2.min.css') }}"> 
+    <link rel="stylesheet" href="{{ url('assets/plugins/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ url('assets/dist/css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ url('assets/customs/css/styleku.css?v='.date('YmdHis')) }}">
     <link rel="stylesheet" href="{{ url('assets/customs/css/custom.css?v='.date('YmdHis')) }}">
@@ -14,20 +14,39 @@
     <link rel="stylesheet" href="{{ url('assets/customs/css/newLoader.css?v='.date('YmdHis')) }}">
     <link rel="stylesheet" href="{{ url('assets/customs/css/scrollTop.css?v='.date('YmdHis')) }}">
     <title>Web Form</title>
-    
+
     <style>
         label {
             font-weight: bold;
             margin-top: 5px;
         }
-        
+
         input.form-check-input {
             margin-top: 9px;
         }
-        
+
         form#formOrder {
             padding: 10px;
-        }   
+        }
+
+        label.error {
+            display: block;
+            width: 100%;
+        }
+
+        #agreeTncCol,
+        #agreeTncCol .form-check {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #agreeTncCol .form-check-label {
+            order: 1;
+        }
+
+        #agreeTncCol label.error {
+            order: 2;
+        }
 
     </style>
 </head>
@@ -153,11 +172,37 @@
                 </div>
             </div>
             <div class="row mt-2">
+                <div class="col" id="agreeTncCol">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="agreeTnc" id="agreeTnc" required>
+                        <label class="form-check-label" for="agreeTnc">
+                            Saya telah membaca dan menyetujui <a href="#" data-toggle="modal" data-target="#tncModal" id="tncLink">Syarat &amp; Ketentuan</a>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2">
                 <div class="col">
                     <button type="submit" class="btn btn-primary mt-2" style="width:100%">Submit</button>
                 </div>
             </div>
         </form>
+    </div>
+
+    <div class="modal fade" id="tncModal" tabindex="-1" role="dialog" aria-labelledby="tncModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tncModalLabel">Syarat &amp; Ketentuan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe src="{{ url(rawurlencode('T&C_Mismass.pdf')) }}#toolbar=0" style="width:100%;height:100%;border:0;"></iframe>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="{{url('assets/plugins/jquery/jquery.min.js')}}"></script>

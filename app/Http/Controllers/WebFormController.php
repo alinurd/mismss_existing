@@ -51,14 +51,14 @@ class WebFormController extends Controller
                 $refId=0;
             }
         }
-        
+
         $firstN = $firstName;
         $middleN = " ".$middleName ?? "";
         $lastN = " ".$lastName ?? "";
         $fullName = $firstN.$middleN.$lastN;
-        
+
         $fullAddress = $address.", ".$subDistrict.", ".$district.", ".$city.", ".$prov.", ".$postalCode;
-        $registerErrText = "Your data has been registered. Please Kindly message our admin for the further detail."; 
+        $registerErrText = "Your data has been registered. Please Kindly message our admin for the further detail.";
 
         $cek_phone = DB::table('cust_list')->where("phone","like","%".$phone."%")->first();
 
@@ -102,7 +102,7 @@ class WebFormController extends Controller
             $encode = array("status" => "Something Wrong", "text" => "Fail to input Customer");
             return json_encode($encode);
         }
-        
+
         $phoneFix = "+".DB::table("country_phone_codes")->where("id",$countryId)->value("code").$phone;
 
         // $orderModel = new Order;
@@ -133,7 +133,7 @@ class WebFormController extends Controller
         //     return json_encode($encode);
         // }
 
-        if(env('SEND_EMAIL')){
+        // if(env('SEND_EMAIL')){
             $ccEmail = explode(",",env('MAIL_CC'));
             $bccEmail = env('MAIL_BCC');
 
@@ -145,22 +145,23 @@ class WebFormController extends Controller
                 "phone" => $phoneFix,
                 "modes" => "WEB" //Webform = "WEB", create invoice = "CINV", create shipment = "CSHI"
             ];
-            
+
             $sendingMail = Mail::to($email)
                             ->cc($ccEmail)
                             ->bcc($bccEmail)
                             ->send(new SendMail($emailData));
-        }
+                            // dd($sendingMail);
+        // }
 
 //         $data = [
 //             "phone" => $phone,
-//             "message" => "Halo *".$fullName."* We have received your registration with below details : 
+//             "message" => "Halo *".$fullName."* We have received your registration with below details :
 
 // Full Name : *".$fullName."*
 // Whatsapp No : *".$phone."*
 // Email : *".$email."*
 // Full Address : *".$fullAddress."*
-            
+
 // Kindly wait for further confirmations. Thank You.
 
 // Send from website https://www.mismasslogistic.com",
