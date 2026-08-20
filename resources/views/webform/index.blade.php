@@ -171,6 +171,7 @@
                     </select>
                 </div>
             </div>
+            @if(env('TNC_ENABLED', false))
             <div class="row mt-2">
                 <div class="col" id="agreeTncCol">
                     <div class="form-check">
@@ -181,6 +182,7 @@
                     </div>
                 </div>
             </div>
+            @endif
             <div class="row mt-2">
                 <div class="col">
                     <button type="submit" class="btn btn-primary mt-2" style="width:100%">Submit</button>
@@ -189,6 +191,7 @@
         </form>
     </div>
 
+    @if(env('TNC_ENABLED', false))
     <div class="modal fade" id="tncModal" tabindex="-1" role="dialog" aria-labelledby="tncModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
             <div class="modal-content">
@@ -204,6 +207,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     <script src="{{url('assets/plugins/jquery/jquery.min.js')}}"></script>
     <script src="{{url('assets/plugins/jquery-mask/jquery.mask.min.js')}}"></script>

@@ -65,7 +65,7 @@ class SendMail extends Mailable
      */
     public function attachments(): array
     {
-        if($this->emailData['modes']=="WEB"){
+        if($this->emailData['modes']=="WEB" && env('TNC_ENABLED', false)){
             return [
                 Attachment::fromPath(public_path('T&C_Mismass.pdf'))
                     ->as('Syarat & Ketentuan Mismass.pdf')
