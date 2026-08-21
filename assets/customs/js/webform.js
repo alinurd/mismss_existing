@@ -18,14 +18,14 @@ $("input[name='sameSender']").on("click",function(){
 
 let tncViewed = false;
 
-$("#tncModal").on("hidden.bs.modal", function () {
+$("#tncModalId, #tncModalEn").on("hidden.bs.modal", function () {
     tncViewed = true;
 });
 
 $("#agreeTnc").on("change", function () {
     if ($(this).is(":checked") && !tncViewed) {
         $(this).prop("checked", false);
-        $("#tncModal").modal("show");
+        $("#tncModalId").modal("show");
     }
 });
 

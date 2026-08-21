@@ -177,7 +177,8 @@
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="agreeTnc" id="agreeTnc" required>
                         <label class="form-check-label" for="agreeTnc">
-                            Saya telah membaca dan menyetujui <a href="#" data-toggle="modal" data-target="#tncModal" id="tncLink">Syarat &amp; Ketentuan</a>
+                            Saya telah membaca dan menyetujui <a href="#" data-toggle="modal" data-target="#tncModalId" id="tncLinkId">Syarat &amp; Ketentuan</a>
+                            / I have read and agree to the <a href="#" data-toggle="modal" data-target="#tncModalEn" id="tncLinkEn">Terms &amp; Conditions</a>
                         </label>
                     </div>
                 </div>
@@ -192,17 +193,32 @@
     </div>
 
     @if(env('TNC_ENABLED', false))
-    <div class="modal fade" id="tncModal" tabindex="-1" role="dialog" aria-labelledby="tncModalLabel" aria-hidden="true">
+    <div class="modal fade" id="tncModalId" tabindex="-1" role="dialog" aria-labelledby="tncModalIdLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="tncModalLabel">Syarat &amp; Ketentuan</h5>
+                    <h5 class="modal-title" id="tncModalIdLabel">Syarat &amp; Ketentuan</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body p-0">
-                    <iframe src="{{ url(rawurlencode('T&C_Mismass.pdf')) }}#toolbar=0" style="width:100%;height:100%;border:0;"></iframe>
+                    <iframe src="{{ url(rawurlencode('T&C_Mismass_ID.pdf')) }}#toolbar=0" style="width:100%;height:100%;border:0;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="tncModalEn" tabindex="-1" role="dialog" aria-labelledby="tncModalEnLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tncModalEnLabel">Terms &amp; Conditions</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe src="{{ url(rawurlencode('T&C_Mismass_EN.pdf')) }}#toolbar=0" style="width:100%;height:100%;border:0;"></iframe>
                 </div>
             </div>
         </div>

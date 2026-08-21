@@ -157,36 +157,36 @@ $forwarder = $forwarderId!="" ? ($forwarderId=="VENDOR" ? $forwarderName." | ".$
     .bold-text {
         font-weight: bold;
     }
-    
+
     table.total tr th{
         padding:4px 0px;
     }
     table.total {
         /*font-size:14px;*/
-        border-collapse: collapse; 
+        border-collapse: collapse;
     }
     table.total tr td{
         padding:10px 0px;
         /*border:1px dotted blue;*/
     }
 
-    
+
     @media (max-width:500px) {
         .printout {
             zoom:45%;
         }
-            
+
         .btn-group {
             display: flex;
             justify-content: center;
         }
-        
+
         .container {
             margin-top: 0px;
             margin-bottom: 0px;
             background: #fff;
         }
-        
+
         .btn-share, .btn-cetak {
             width:100%;
         }
@@ -214,12 +214,12 @@ $forwarder = $forwarderId!="" ? ($forwarderId=="VENDOR" ? $forwarderName." | ".$
         .fixed-bottom {
             display: none;
         }
-        
+
         .container {
             background-color: white;
             margin-top:0px;
         }
-        
+
         .printout {
             zoom:95%;
         }
@@ -313,7 +313,7 @@ $forwarder = $forwarderId!="" ? ($forwarderId=="VENDOR" ? $forwarderName." | ".$
                                         <div style="width:5%">:</div>
                                         <div class="bold-text" style="width:55%;text-align: right;">{{$mstrack}}</div>
                                     </div>
-                                    
+
                                     @if($custTypeId=="IND")
                                     <!-- <div style="display: flex;">
                                         <div style="width:40%">No.Resi</div>
@@ -321,13 +321,13 @@ $forwarder = $forwarderId!="" ? ($forwarderId=="VENDOR" ? $forwarderName." | ".$
                                         <div class="bold-text" style="width:55%;text-align: right;">{{$forwarder}}</div>
                                     </div> -->
                                     @endif
-                                    
+
                                 </div>
                             </div>
                         </td>
                     </tr>
                 </table>
-                
+
                 <table width="100%" class="total" style="line-height: 22px;margin-top:20px;border-spacing: 0;">
                     <thead>
                         <tr style="text-align:left">
@@ -396,8 +396,8 @@ $forwarder = $forwarderId!="" ? ($forwarderId=="VENDOR" ? $forwarderName." | ".$
                         $servicePricePer = $g->service_price_per==0?"-":($fc_symbol==""? App\Http\Controllers\Controller::rupiah($g->service_price_per) : "S$ ".round($g->service_price_per/$fc_value,2));
 
                         @endphp
-                        
-                        
+
+
                         <tr style="border-top:1px solid #d5d5d5;">
                             @if($custTypeId=="COR")
                             <td style="text-align: left;vertical-align:top;">
@@ -552,7 +552,7 @@ $forwarder = $forwarderId!="" ? ($forwarderId=="VENDOR" ? $forwarderName." | ".$
                             <td style="text-align:right"><?php echo $fc_symbol==""? App\Http\Controllers\Controller::rupiah($g->other_pickup_fee) : "S$ ".round($g->other_pickup_fee/$fc_value,2)?></td>
                         </tr>
                         @endif
-                        
+
                         @if($g->additional_nom>0)
                         <tr style='border-top:1px solid #d5d5d5;border-bottom:1px solid #d5d5d5;'>
                             <td></td>
@@ -579,7 +579,7 @@ $forwarder = $forwarderId!="" ? ($forwarderId=="VENDOR" ? $forwarderName." | ".$
                             @endif
                             <td <?php echo $custTypeId=="IND" ? "colspan='2'" : "" ?>></td>
                             <td class="bold-text" style="text-align: left;vertical-align:top">Grand Total</td>
-                            <td colspan=2 style="vertical-align:middle"> 
+                            <td colspan=2 style="vertical-align:middle">
                                 <div>{{$totalKgBulat}} Kg</div>
                                 <div>{{$totalItem}} Item</div>
                                 <div>{{str_replace(".",",", (string)$totalCbmBulat)}} CBM</div>
@@ -603,13 +603,13 @@ $forwarder = $forwarderId!="" ? ($forwarderId=="VENDOR" ? $forwarderName." | ".$
                         </tr>
                     </tbody>
                 </table>
-                
+
                 <table style="margin-top:20px">
                     <tr>
                         <td>
                             <div class="bold-text">Payment Instruction</div>
                             <div>Please make payment at your earliest convenience before we dispatch to your address. We reserves the right to hold any shipment if payment has not been made.</div>
-                            
+
                             @if($dokuLink!="")
                             <div class="bold-text" style="margin-top:10px">Link Payment</div>
                             <div class="bold-text"><a href="{{(preg_match("/doku.com/i", $dokuLink)?$dokuLink:url('payment')."/".$dokuLink)}}" target="_blank">Click Here To Make Payment Process!</a></div>
@@ -618,7 +618,7 @@ $forwarder = $forwarderId!="" ? ($forwarderId=="VENDOR" ? $forwarderName." | ".$
                             <div style='color:blue;display:flex'><div>{{$bankName}} :</div><div style="font-weight:bold;margin-left:5px">{{$bankAccountName}}</div></div>
                             <div style='color:red;display:flex'><div>No. Rekening / Virtual Account :</div><div style="font-weight:bold;margin-left:5px">{{$bankAccountId}}</div></div>
                             @endif
-                            
+
                         </td>
                         <td style="background:#f0f3f4;padding:30px;">
                             <div style="font-size:20px;text-align: center;font-weight: 600;">Total Bill</div>
@@ -657,7 +657,7 @@ effective without a signature because it is issued electronically.</div>
 <script src="{{ url('assets/plugins/qrcode-maker/qrcode.js') }}"></script>
 <script>
     $("#barcode").JsBarcode("{{$mismassInvoiceId}}");
-    
+
     var qrcode = new QRCode(document.getElementById("qrcode"), {
         // text: "{{(preg_match('/doku.com/i', $dokuLink)?$dokuLink:url('payment')."/".$dokuLink)}}",
         text: "{{'https://print.app-mismass.com/p/'.$mismassInvoiceLink}}",
@@ -667,7 +667,7 @@ effective without a signature because it is issued electronically.</div>
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H
     });
-    
+
     let err,fullN="{{$invoiceToName}}";
     const shareData = {
         title: 'Mismass Invoice {{$mismassInvoiceId}}',
@@ -687,6 +687,9 @@ effective without a signature because it is issued electronically.</div>
         }
     });
 
+    const tncEnabled = @json(env('TNC_ENABLED', false));
+    let tncViewed = false;
+
     showInvoiceAlert("{{$mismassInvoiceId}}");
 
     function showInvoiceAlert(invoiceId) {
@@ -700,11 +703,25 @@ effective without a signature because it is issued electronically.</div>
                         (WAJIB mencantumkan nomor invoice pada kolom berita acara/keterangan transfer.)
                     </strong>
                     <br><br>
-                    Hal ini bertujuan supaya pembayaran dapat dengan cepat terverifikasi sehingga 
+                    Hal ini bertujuan supaya pembayaran dapat dengan cepat terverifikasi sehingga
                     proses pengiriman bisa dilakukan lebih cepat. Terima kasih.
                     <br><br>
                     <b>Nomor Invoice:</b>
                     <span id="nomorInvoice">${invoiceId}</span>
+                    @if(env('TNC_ENABLED', false))
+            <div class="row mt-2">
+                <div class="col" id="agreeTncCol">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="agreeTnc" id="agreeTnc" required>
+                        <label class="form-check-label" for="agreeTnc" style="font-size:12px;">
+                            Saya telah membaca dan menyetujui <a href="{{ url(rawurlencode('T&C_Mismass_ID.pdf')) }}" target="_blank" id="tncLinkId">Syarat &amp; Ketentuan</a> <br>
+                            I have read and agree to the <a href="{{ url(rawurlencode('T&C_Mismass_EN.pdf')) }}" target="_blank" id="tncLinkEn">Terms &amp; Conditions</a>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            @endif
+
                 </p>
             `,
             showCancelButton: true,
@@ -714,7 +731,37 @@ effective without a signature because it is issued electronically.</div>
             confirmButtonText: 'Copy No. Invoice',
             cancelButtonText: 'Tutup',
             confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#aaa'
+            cancelButtonColor: '#aaa',
+            didOpen: () => {
+                if (tncEnabled) {
+                    const confirmBtn = Swal.getConfirmButton();
+                    const cancelBtn = Swal.getCancelButton();
+
+                    if (!tncViewed) {
+                        confirmBtn.disabled = true;
+                        cancelBtn.disabled = true;
+                    }
+
+                    $("#tncLinkId, #tncLinkEn").on("click", function () {
+                        tncViewed = true;
+                        confirmBtn.disabled = false;
+                        cancelBtn.disabled = false;
+                    });
+
+                    $("#agreeTnc").on("change", function () {
+                        if ($(this).is(":checked") && !tncViewed) {
+                            $(this).prop("checked", false);
+                            Swal.showValidationMessage('Silakan baca Syarat & Ketentuan terlebih dahulu');
+                        }
+                    });
+                }
+            },
+            preConfirm: () => {
+                if (tncEnabled && !$("#agreeTnc").is(":checked")) {
+                    Swal.showValidationMessage('Anda harus membaca dan menyetujui Syarat & Ketentuan terlebih dahulu');
+                    return false;
+                }
+            }
         }).then((result) => {
             if (result.isConfirmed) {
                 const text = document.getElementById('nomorInvoice').innerText;

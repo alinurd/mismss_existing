@@ -67,8 +67,11 @@ class SendMail extends Mailable
     {
         if($this->emailData['modes']=="WEB" && env('TNC_ENABLED', false)){
             return [
-                Attachment::fromPath(public_path('T&C_Mismass.pdf'))
+                Attachment::fromPath(public_path('T&C_Mismass_ID.pdf'))
                     ->as('Syarat & Ketentuan Mismass.pdf')
+                    ->withMime('application/pdf'),
+                Attachment::fromPath(public_path('T&C_Mismass_EN.pdf'))
+                    ->as('Terms & Conditions Mismass.pdf')
                     ->withMime('application/pdf'),
             ];
         }
