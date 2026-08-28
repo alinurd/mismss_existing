@@ -687,7 +687,7 @@ effective without a signature because it is issued electronically.</div>
         }
     });
 
-    const tncEnabled = @json(env('TNC_ENABLED', false));
+    const tncEnabled = @json(env('TNC_ENABLED', false) && !auth()->check());
     let tncViewed = false;
 
     showInvoiceAlert("{{$mismassInvoiceId}}");
@@ -708,7 +708,7 @@ effective without a signature because it is issued electronically.</div>
                     <br><br>
                     <b>Nomor Invoice:</b>
                     <span id="nomorInvoice">${invoiceId}</span>
-                    @if(env('TNC_ENABLED', false))
+                    @if(env('TNC_ENABLED', false) && !auth()->check())
             <div class="row mt-2">
                 <div class="col" id="agreeTncCol">
                     <div class="form-check">
