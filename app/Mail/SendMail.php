@@ -53,6 +53,10 @@ class SendMail extends Mailable
             $view = "email.create-shipment";
         }
 
+        if($this->emailData['modes']=="TNC"){
+            $view = "email.tnc-blast";
+        }
+
         return new Content(
             view: $view,
         );
@@ -65,7 +69,7 @@ class SendMail extends Mailable
      */
     public function attachments(): array
     {
-        if($this->emailData['modes']=="WEB" && env('TNC_ENABLED', false)){
+        if(($this->emailData['modes']=="WEB" || $this->emailData['modes']=="TNC") && env('TNC_ENABLED', false)){
             return [
                 Attachment::fromPath(public_path('T&C_Mismass_ID.pdf'))
                     ->as('Syarat & Ketentuan Mismass.pdf')

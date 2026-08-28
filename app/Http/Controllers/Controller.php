@@ -85,6 +85,8 @@ class Controller extends BaseController
         Auth::user()->revisi_btn = $get->revisi_btn;
         Auth::user()->mail_page = $get->mail_page;
         Auth::user()->announcer_update = $get->announcer_update;
+        Auth::user()->tncblast_page = $get->tncblast_page;
+        Auth::user()->tncblast_send = $get->tncblast_send;
 
         return true;
     }

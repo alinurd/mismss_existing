@@ -26,6 +26,7 @@ use App\Http\Controllers\VoidController;
 use App\Http\Controllers\ApiJneController;
 use App\Http\Controllers\ApiSentralKargoController;
 use App\Http\Controllers\AnnouncerController;
+use App\Http\Controllers\TncBlastController;
 use App\Http\Middleware\Verify;
 use Illuminate\Support\Facades\Auth;
 
@@ -97,6 +98,13 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::controller(AnnouncerController::class)->group(function(){
         Route::post('/announcer/update', 'updateAnnouncer')->name('announcer.update');
+    });
+
+    Route::controller(TncBlastController::class)->group(function(){
+        Route::post('/tncblast', 'index')->name('tncblast.index');
+        Route::get('/tncblast/table', 'table')->name('tncblast.table');
+        Route::post('/tncblast/version', 'updateVersion')->name('tncblast.version');
+        Route::post('/tncblast/send', 'send')->name('tncblast.send');
     });
 
     Route::controller(DiskonController::class)->group(function(){

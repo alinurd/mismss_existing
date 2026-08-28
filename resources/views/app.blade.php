@@ -244,6 +244,15 @@
                         </li>
                         @endif
 
+                        @if(Auth::user()->tncblast_page)
+                        <li class="nav-item">
+                            <a href="#" data-id="tncblast" link="{{url('/tncblast')}}" class="nav-link">
+                                <i class="nav-icon fas fa-file-signature"></i>
+                                <p>TnC Blast</p>
+                            </a>
+                        </li>
+                        @endif
+
 
                         <!-- ============================= -->
                         <!-- UTILITIES                     -->
