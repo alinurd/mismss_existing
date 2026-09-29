@@ -408,7 +408,7 @@
 
             setInterval(() => {
                 checkExpired();
-            }, 5000);
+            }, 30000);
 
             // $("#example1").DataTable({
             //     "responsive": true,
