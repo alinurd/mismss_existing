@@ -87,7 +87,9 @@ class WebFormController extends Controller
         $custModel->city = $city;
         $custModel->prov = $prov;
         $custModel->postal_code = $postalCode;
-        $custModel->cust_type_id = "IND";
+        // Default TETAP individu (IND). Hanya custType=COR (dikirim pendaftaran apps baru utk akun korporat) yang menjadi korporat;
+        // form web lama tidak mengirim parameter ini, nilai kosong/lain pun tetap IND. Nama perusahaan dikirim di firstName.
+        $custModel->cust_type_id = strtoupper((string) $request->input('custType')) === 'COR' ? 'COR' : 'IND';
         $custModel->created_by = "WEBFORM";
         $custModel->updated_by = "WEBFORM";
         $custModel->know_from_id = $knowFrom;

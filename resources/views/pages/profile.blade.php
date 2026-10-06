@@ -16,7 +16,7 @@
                                     <li class="small mt-1"><span class="fa-li"><i class="fas fa-lg fa-building"></i></span> {{$address}}</li>
                                     <li class="small mt-1"><span class="fa-li"><i class="fas fa-envelope"></i></span> {{$email}}</li>
                                     @if($referral!="")
-                                        <input type="hidden" id="referral" value="https://mismasslogistic.com/form-order?ref={{$referral}}"/>
+                                        <input type="hidden" id="referral" value="https://old.mismasslogistic.com/form-order?ref={{$referral}}"/>
                                         <li class="small mt-1"><span class="fa-li"><i class="fas fa-link"></i></span> <a class='pointlink copyLinkRef' data-toggle="tooltip" title="Link Tercopy!">Copy Link Referral</a></li>
                                     @endif
                                 </ul>
