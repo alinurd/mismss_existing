@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\AppController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ApiTrackingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +23,35 @@ Route::post('/apijne/webhook/sandbox', [WebhookController::class, 'SBJne']);
 
 Route::post('/sentralkar/webhook', [WebhookController::class, 'sentralCargo']);
 Route::post('/sentralkar/webhook/sandbox', [WebhookController::class, 'SBSentralCargo']);
+
+
+/*
+|--------------------------------------------------------------------------
+| Shipment tracking (read-only, API key `key-tracking-...` via X-API-Key)
+|--------------------------------------------------------------------------
+| GET /api/tracking?id=MMS45219783EUID  (header X-API-Key: key-tracking-xxxx)
+| Pure JSON (no HTML), served by ApiTrackingController. Does not modify or share
+| code paths with the existing /shiptrip/tracking/system web endpoint.
+*/
+Route::get('/tracking', [ApiTrackingController::class, 'show'])->middleware('api.key:tracking');
+
+
+/*
+|--------------------------------------------------------------------------
+| Internal API (static API key required, header X-API-Key)
+|--------------------------------------------------------------------------
+| Keys are set in .env as API_INTERNAL_KEYS (comma-separated).
+*/
+Route::middleware('api.key:internal')->group(function () {
+    // GET /api/dashboard?type=F|T&... (reuses AppController::loadDashboard / Dashboard model)
+    Route::get('/dashboard', [AppController::class, 'loadDashboard']);
+
+    // GET /api/customers?cust_type_id=IND|COR&search=...&per_page=25&page=1
+    Route::get('/customers', [CustomerController::class, 'apiIndex']);
+
+    // GET /api/customers/{id}
+    Route::get('/customers/{id}', [CustomerController::class, 'apiShow']);
+});
 
 
 // Route::middleware('auth:sanctum')->post('/dokunotif', function (Request $request) {

@@ -10,6 +10,206 @@ use App\Models\Afunction as Dev8th;
 
 class CustomerController extends Controller
 {
+    /**
+     * Read-only JSON listing of customers with full address data, for API consumers.
+     * GET /api/customers?cust_type_id=IND|COR&search=...&reference=vivi&per_page=25&page=1
+     *
+     * `reference` matches the CS/marketing user assigned as this customer's referrer.
+     * Pass either their user id, or a partial name/username (e.g. "vivi", "rifa").
+     *
+     * Each customer carries a `shipping` summary (invoices, shipments, kg, ...). It can be narrowed with
+     * payment_status=SUCCESS,PENDING  invoice_status=PAID  date_from=YYYY-MM-DD  date_to=YYYY-MM-DD
+     * (date range applies to the invoice date).
+     */
+    public function apiIndex(Request $request)
+    {
+        $custTypeId = $request->input('cust_type_id');
+        $search = $request->input('search');
+        $reference = $request->input('reference');
+        $perPage = (int) $request->input('per_page', 25);
+        $perPage = $perPage > 0 ? min($perPage, 100) : 25;
+
+        $query = Customer::query()
+            ->select('cust_list.*', 'country_phone_codes.code as country_code')
+            ->join('country_phone_codes', 'country_phone_codes.id', '=', 'cust_list.country_id')
+            ->orderBy('cust_list.updated_at', 'desc');
+
+        if (in_array($custTypeId, ['IND', 'COR'], true)) {
+            $query->where('cust_list.cust_type_id', $custTypeId);
+        }
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('cust_list.first_name', 'like', "%{$search}%")
+                    ->orWhere('cust_list.middle_name', 'like', "%{$search}%")
+                    ->orWhere('cust_list.last_name', 'like', "%{$search}%")
+                    ->orWhere('cust_list.email', 'like', "%{$search}%")
+                    ->orWhere('cust_list.phone', 'like', "%{$search}%");
+            });
+        }
+
+        if (!empty($reference)) {
+            if (is_numeric($reference)) {
+                $query->where('cust_list.reference', $reference);
+            } else {
+                $refUserId = DB::table('users')
+                    ->whereIn('role_id', ['537469', '518374'])
+                    ->where(function ($q) use ($reference) {
+                        $q->where('fullname', 'like', "%{$reference}%")
+                            ->orWhere('username', 'like', "%{$reference}%");
+                    })
+                    ->value('id');
+
+                $query->where('cust_list.reference', $refUserId ?? -1);
+            }
+        }
+
+        $filters = $this->apiShippingFilters($request);
+        if (isset($filters['error'])) {
+            return response()->json(['status' => 422, 'message' => $filters['error']], 422);
+        }
+
+        $customers = $query->paginate($perPage);
+        $shipping = $this->apiShippingSummary($customers->getCollection()->pluck('id')->all(), $filters);
+
+        return response()->json([
+            'status' => 200,
+            'data' => $customers->getCollection()->map(fn ($c) => $this->apiCustomerPayload($c, $shipping[(int) $c->id] ?? null, $filters)),
+            'meta' => [
+                'current_page' => $customers->currentPage(),
+                'per_page' => $customers->perPage(),
+                'total' => $customers->total(),
+                'last_page' => $customers->lastPage(),
+            ],
+        ]);
+    }
+
+    /**
+     * Read-only JSON detail of a single customer with full address data.
+     * GET /api/customers/{id}
+     */
+    public function apiShow(Request $request, $id)
+    {
+        $customer = Customer::query()
+            ->select('cust_list.*', 'country_phone_codes.code as country_code')
+            ->join('country_phone_codes', 'country_phone_codes.id', '=', 'cust_list.country_id')
+            ->where('cust_list.id', $id)
+            ->first();
+
+        if (!$customer) {
+            return response()->json(['status' => 404, 'message' => 'Customer not found'], 404);
+        }
+
+        $filters = $this->apiShippingFilters($request);
+        if (isset($filters['error'])) {
+            return response()->json(['status' => 422, 'message' => $filters['error']], 422);
+        }
+        $shipping = $this->apiShippingSummary([$customer->id], $filters);
+
+        return response()->json(['status' => 200, 'data' => $this->apiCustomerPayload($customer, $shipping[(int) $customer->id] ?? null, $filters)]);
+    }
+
+    private function apiShippingFilters(Request $request)
+    {
+        $list = fn ($v) => array_values(array_filter(array_map(fn ($x) => strtoupper(trim($x)), explode(',', (string) $v))));
+        $from = $request->input('date_from');
+        $to = $request->input('date_to');
+
+        foreach (['date_from' => $from, 'date_to' => $to] as $name => $d) {
+            if (!empty($d) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) {
+                return ['error' => "Parameter {$name} must be YYYY-MM-DD"];
+            }
+        }
+        if (!empty($from) && !empty($to) && $from > $to) {
+            return ['error' => 'date_from must not be after date_to'];
+        }
+
+        return [
+            'payment_status' => $list($request->input('payment_status')),
+            'invoice_status' => $list($request->input('invoice_status')),
+            'date_from' => $from ?: null,
+            'date_to' => $to ?: null,
+        ];
+    }
+
+    /**
+     * Aggregate data_list per customer. One row of data_list = one shipment (ms_track_id);
+     * only rows that already have an invoice are counted.
+     */
+    private function apiShippingSummary(array $custIds, array $f)
+    {
+        if (empty($custIds)) {
+            return [];
+        }
+
+        $q = DB::table('data_list')
+            ->selectRaw("cust_id,
+                COUNT(DISTINCT mismass_invoice_id) as total_invoice,
+                COUNT(DISTINCT NULLIF(ms_track_id, '')) as total_shipment,
+                COALESCE(SUM(item), 0) as total_item,
+                COALESCE(SUM(weight), 0) as weight_kg,
+                COALESCE(SUM(actual_weight), 0) as actual_weight_kg,
+                COALESCE(SUM(cbm), 0) as cbm")
+            ->whereIn('cust_id', $custIds)
+            ->where('mismass_invoice_id', '!=', '')
+            ->groupBy('cust_id');
+
+        if ($f['payment_status']) {
+            $q->whereIn('payment_status', $f['payment_status']);
+        }
+        if ($f['invoice_status']) {
+            $q->whereIn('invoice_status', $f['invoice_status']);
+        }
+        if ($f['date_from']) {
+            $q->where('mismass_invoice_date', '>=', $f['date_from'] . ' 00:00:00');
+        }
+        if ($f['date_to']) {
+            $q->where('mismass_invoice_date', '<=', $f['date_to'] . ' 23:59:59');
+        }
+
+        return $q->get()->keyBy(fn ($r) => (int) $r->cust_id)->all();
+    }
+
+    private function apiCustomerPayload($c, $shipping = null, $filters = null)
+    {
+        $totalInvoice = Dev8th::getInvoiceByCust($c->id, ["", ""]);
+        $status = ($totalInvoice > 1 || $this->oldCustOrNot($c->phone) > 0) ? 'OC' : 'NC';
+
+        return [
+            'id' => $c->id,
+            'cust_type_id' => $c->cust_type_id,
+            'first_name' => $c->first_name,
+            'middle_name' => $c->middle_name,
+            'last_name' => $c->last_name,
+            'email' => $c->email,
+            'country_code' => $c->country_code,
+            'phone' => $c->phone,
+            'address' => $c->address,
+            'sub_district' => $c->sub_district,
+            'district' => $c->district,
+            'city' => $c->city,
+            'prov' => $c->prov,
+            'postal_code' => $c->postal_code,
+            'reference' => $c->reference,
+            'reference_code' => $c->reference != 0 ? (DB::table('users')->where('id', $c->reference)->value('ref_code') ?: null) : null,
+            'reference_name' => $c->reference != 0 ? strtoupper((string) $this->getReferenceFullName($c->reference)) : null,
+            'know_from_id' => $c->know_from_id,
+            'status' => $status,
+            'total_invoice' => $totalInvoice,
+            'shipping' => [
+                'filter' => $filters,
+                'total_invoice' => (int) ($shipping->total_invoice ?? 0),
+                'total_shipment' => (int) ($shipping->total_shipment ?? 0),
+                'total_item' => (int) ($shipping->total_item ?? 0),
+                'weight_kg' => round((float) ($shipping->weight_kg ?? 0), 2),
+                'actual_weight_kg' => round((float) ($shipping->actual_weight_kg ?? 0), 2),
+                'cbm' => round((float) ($shipping->cbm ?? 0), 3),
+            ],
+            'created_at' => $c->created_at,
+            'updated_at' => $c->updated_at,
+        ];
+    }
+
     public function index()
     {
         if(!env('CUST_LIST')){

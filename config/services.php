@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // Static API keys for /api routes, comma-separated (e.g. key-tracking-xxxx,key-tracking-yyyy)
+    'api_keys' => [
+        'tracking' => env('API_TRACKING_KEYS'),
+        'internal' => env('API_INTERNAL_KEYS'),
+    ],
+
 ];
