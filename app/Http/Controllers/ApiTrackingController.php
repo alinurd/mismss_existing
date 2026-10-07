@@ -29,14 +29,41 @@ class ApiTrackingController extends Controller
             }
 
             $msTrackId = $data['wayBill'][0]['id'];
+            $waybills = array_values(array_unique(array_map(fn ($w) => $w['id'], $data['wayBill'])));
+
+            $shipment = $this->shipment($msTrackId);
+            $timeline = $this->timeline($msTrackId);
+
+            // Every waybill has its own shipment + timeline; the first one is already loaded above.
+            $details = [];
+            foreach ($waybills as $wb) {
+                if ($wb === $msTrackId) {
+                    $details[] = ['id' => $wb, 'temporary' => TrackSystem::checkResiTemporary($wb) !== '', 'shipment' => $shipment, 'timeline' => $timeline];
+                    continue;
+                }
+
+                // one broken secondary waybill must not fail the whole response
+                try {
+                    $details[] = [
+                        'id' => $wb,
+                        'temporary' => TrackSystem::checkResiTemporary($wb) !== '',
+                        'shipment' => $this->shipment($wb),
+                        'timeline' => $this->timeline($wb),
+                    ];
+                } catch (\Throwable $e) {
+                    Log::warning('API tracking: waybill '.$wb.' skipped: '.$e->getMessage());
+                    $details[] = ['id' => $wb, 'temporary' => false, 'shipment' => null, 'timeline' => []];
+                }
+            }
 
             return response()->json([
                 'status' => 200,
                 'id' => $msTrackId,
-                'temporary' => TrackSystem::checkResiTemporary($msTrackId) !== '',
-                'waybills' => array_map(fn ($w) => $w['id'], $data['wayBill']),
-                'shipment' => $this->shipment($msTrackId),
-                'timeline' => $this->timeline($msTrackId),
+                'temporary' => $details[0]['temporary'],
+                'waybills' => $waybills,
+                'shipment' => $shipment,
+                'timeline' => $timeline,
+                'waybill_details' => $details,
             ]);
         } catch (\Throwable $e) {
             Log::error('API tracking failed for '.$id.': '.$e->getMessage());
@@ -56,6 +83,7 @@ class ApiTrackingController extends Controller
             'invoice_number' => null,
             'foreign_tracks' => DB::table('shiptrip_foreign_track_list')->where('ms_track_id', $msTrackId)->pluck('id')->all(),
             'forwarder' => null,
+            'attachments' => $this->attachments($msTrackId),
             'customer' => ['type' => null, 'name' => null, 'phone' => null, 'address' => null],
         ];
 
@@ -142,17 +170,63 @@ class ApiTrackingController extends Controller
         $timeline = [];
         foreach ($rows as $i => $r) {
             $time = date('H:i', strtotime($r->created_at));
+            $text = str_replace('<br>', ' ', TrackSystem::checkTimelineText($r->text, $msTrackId, 1));
             $timeline[] = [
                 'datetime' => date('c', strtotime($r->created_at)),
                 'date' => date('Y-m-d', strtotime($r->created_at)),
                 'time' => $time === '00:00' ? null : $time,
                 'status' => $r->track_status_manual_id != 'A' ? $r->trackmantitle : $r->tracktitle,
-                'description' => trim(html_entity_decode(strip_tags(str_replace('<br>', ' ', TrackSystem::checkTimelineText($r->text, $msTrackId, 1))))),
+                'description' => trim(html_entity_decode(strip_tags($text))),
+                'attachments' => $this->linksFromHtml($text),
                 'active' => $i === 0,
             ];
         }
 
         return $timeline;
+    }
+
+    /**
+     * Package photos and proof-of-delivery (POD) files of one waybill, as absolute URLs.
+     * Sources: shiptrip_image_list (photos), shiptrip_pod_image_list + data_list.shipping_success_pod (POD).
+     */
+    private function attachments($msTrackId)
+    {
+        $items = [];
+        $add = function ($type, $label, $url) use (&$items) {
+            if ($url && !isset($items[$url])) {
+                $items[$url] = ['type' => $type, 'label' => $label, 'url' => $url];
+            }
+        };
+
+        foreach (DB::table('shiptrip_image_list')->where('ms_track_id', $msTrackId)->get() as $i => $img) {
+            $add('photo', 'Foto '.($i + 1), url('/assets/photos/'.$img->id.'.'.$img->ext));
+        }
+
+        $dl = DB::table('data_list')->select('shipping_number', 'shipping_success_pod')
+            ->where(fn ($q) => $q->where('ms_track_id', $msTrackId)->orWhere('shipping_number', $msTrackId))
+            ->get();
+
+        $podKeys = array_values(array_unique(array_filter(array_merge([$msTrackId], $dl->pluck('shipping_number')->all()))));
+        foreach (DB::table('shiptrip_pod_image_list')->whereIn('shipping_number', $podKeys)->get() as $pod) {
+            $add('pod', 'Bukti penerimaan', url('/assets/pod/'.$pod->id.'.'.$pod->ext));
+        }
+        foreach ($dl->pluck('shipping_success_pod')->filter()->unique() as $file) {
+            // webhook carriers (JNE, Sentral Cargo) store a full URL, drivers store a file name
+            $add('pod', 'Bukti penerimaan', preg_match('#^https?://#i', $file) ? $file : url('/assets/pod/'.$file));
+        }
+
+        return array_values($items);
+    }
+
+    /** <a href="...">label</a> inside a timeline text -> [{label, url}] */
+    private function linksFromHtml($html)
+    {
+        preg_match_all('/<a\b[^>]*\bhref=[\'"]([^\'"]+)[\'"][^>]*>(.*?)<\/a>/is', (string) $html, $m, PREG_SET_ORDER);
+
+        return array_map(fn ($x) => [
+            'label' => trim(html_entity_decode(strip_tags($x[2]))),
+            'url' => html_entity_decode($x[1]),
+        ], $m);
     }
 
     private function date($value)
