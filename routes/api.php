@@ -51,6 +51,9 @@ Route::middleware('api.key:internal')->group(function () {
 
     // GET /api/customers/{id}
     Route::get('/customers/{id}', [CustomerController::class, 'apiShow']);
+
+    // GET /api/customers/{id}/pricing — daftar harga khusus (gudang corporate) milik customer
+    Route::get('/customers/{id}/pricing', [CustomerController::class, 'apiPricing']);
 });
 
 

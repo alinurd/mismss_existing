@@ -109,6 +109,49 @@ class CustomerController extends Controller
         return response()->json(['status' => 200, 'data' => $this->apiCustomerPayload($customer, $shipping[(int) $customer->id] ?? null, $filters)]);
     }
 
+    /**
+     * GET /api/customers/{id}/pricing
+     *
+     * Harga khusus corporate di apps lama = 1 gudang tersendiri per customer (warehouse_list.name
+     * "... (CORPORATE) ...") dgn daftar harga sendiri di service_list. Tidak ada kolom relasi di
+     * cust_list, jadi gudangnya diturunkan dari riwayat order (order_list.cust_id → warehouse_id).
+     * Customer tanpa order di gudang corporate → `warehouse: null`, `services: []`.
+     */
+    public function apiPricing($id)
+    {
+        if (!DB::table('cust_list')->where('id', $id)->exists()) {
+            return response()->json(['status' => 404, 'message' => 'Customer not found'], 404);
+        }
+
+        $wh = DB::table('order_list')
+            ->join('warehouse_list', 'warehouse_list.id', '=', 'order_list.warehouse_id')
+            ->where('order_list.cust_id', $id)
+            ->where('warehouse_list.name', 'like', '%CORPORATE%')
+            ->select('warehouse_list.id', 'warehouse_list.name', DB::raw('MAX(order_list.created_at) as last_used'))
+            ->groupBy('warehouse_list.id', 'warehouse_list.name')
+            ->orderByDesc('last_used')
+            ->first();
+
+        $services = $wh
+            ? DB::table('service_list')->where('warehouse_id', $wh->id)
+                ->orderBy('id')
+                ->get(['name', 'pricekg', 'pricevol', 'priceitem', 'pricecbm', 'updated_at'])
+            : collect();
+
+        return response()->json(['status' => 200, 'data' => [
+            'customer_id' => (string) $id,
+            'warehouse'   => $wh ? ['id' => $wh->id, 'name' => $wh->name] : null,
+            'services'    => $services->map(fn ($s) => [
+                'name'       => $s->name,
+                'price_kg'   => (int) $s->pricekg,
+                'price_vol'  => (int) $s->pricevol,
+                'price_item' => (int) $s->priceitem,
+                'price_cbm'  => (int) $s->pricecbm,
+                'updated_at' => $s->updated_at,
+            ])->values(),
+        ]]);
+    }
+
     private function apiShippingFilters(Request $request)
     {
         $list = fn ($v) => array_values(array_filter(array_map(fn ($x) => strtoupper(trim($x)), explode(',', (string) $v))));
